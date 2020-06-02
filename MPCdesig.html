@@ -1,0 +1,310 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module MPCdesig</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>MPCdesig</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="MPCdesig.py">MPCdesig.py</a></font></td></tr></table>
+    <p><tt>#&nbsp;MPCdesig<br>
+&nbsp;<br>
+&nbsp;&nbsp;This&nbsp;Python&nbsp;3&nbsp;module&nbsp;provides&nbsp;functions&nbsp;for&nbsp;packing&nbsp;and&nbsp;unpacking&nbsp;<br>
+asteroid&nbsp;designations&nbsp;using&nbsp;regular&nbsp;expressions.&nbsp;"Packing"&nbsp;or&nbsp;"unpacking"&nbsp;<br>
+refers&nbsp;to&nbsp;the&nbsp;Minor&nbsp;Planet&nbsp;Center&nbsp;convention&nbsp;described&nbsp;<br>
+[here](https://minorplanetcenter.net/iau/info/PackedDes.html).&nbsp;<br>
+Number&nbsp;designations&nbsp;greater&nbsp;than&nbsp;619999&nbsp;can&nbsp;also&nbsp;be&nbsp;packed&nbsp;and&nbsp;unpacked.&nbsp;<br>
+&nbsp;<br>
+The&nbsp;two&nbsp;main&nbsp;purposes&nbsp;of&nbsp;**MPCdesig**&nbsp;are:<br>
+&nbsp;&nbsp;-&nbsp;to&nbsp;quickly&nbsp;and&nbsp;easily&nbsp;convert&nbsp;a&nbsp;single&nbsp;designation&nbsp;from&nbsp;the&nbsp;command&nbsp;line,&nbsp;<br>
+&nbsp;&nbsp;for&nbsp;example&nbsp;unpack&nbsp;K08E05V&nbsp;into&nbsp;2008&nbsp;EV5&nbsp;or&nbsp;pack&nbsp;620000&nbsp;into&nbsp;~0000.&nbsp;<br>
+&nbsp;&nbsp;-&nbsp;to&nbsp;pack&nbsp;or&nbsp;unpack&nbsp;a&nbsp;list&nbsp;of&nbsp;designations,&nbsp;leaving&nbsp;those&nbsp;which&nbsp;are&nbsp;<br>
+&nbsp;&nbsp;already&nbsp;in&nbsp;the&nbsp;target&nbsp;format&nbsp;unchanged.&nbsp;This&nbsp;is&nbsp;especially&nbsp;helpful&nbsp;when&nbsp;you&nbsp;<br>
+&nbsp;&nbsp;regularly&nbsp;work&nbsp;with&nbsp;lists&nbsp;of&nbsp;asteroids&nbsp;gathered&nbsp;from&nbsp;different&nbsp;sources,&nbsp;which&nbsp;<br>
+&nbsp;&nbsp;likely&nbsp;use&nbsp;different&nbsp;formats,&nbsp;and&nbsp;you&nbsp;want&nbsp;to&nbsp;tabulate&nbsp;all&nbsp;targets&nbsp;with&nbsp;the&nbsp;<br>
+&nbsp;&nbsp;same&nbsp;packed&nbsp;or&nbsp;unpacked&nbsp;format.&nbsp;<br>
+&nbsp;&nbsp;<br>
+The&nbsp;module&nbsp;is&nbsp;more&nbsp;easily&nbsp;used&nbsp;as&nbsp;a&nbsp;script,&nbsp;i.e.&nbsp;directly&nbsp;from&nbsp;the&nbsp;console&nbsp;with<br>
+a&nbsp;command&nbsp;specifying&nbsp;your&nbsp;input&nbsp;designation&nbsp;or&nbsp;the&nbsp;name&nbsp;of&nbsp;a&nbsp;file&nbsp;containing&nbsp;<br>
+designations&nbsp;(see&nbsp;the&nbsp;Examples&nbsp;section&nbsp;below).&nbsp;The&nbsp;output&nbsp;simply&nbsp;goes&nbsp;to&nbsp;stdout&nbsp;<br>
+and&nbsp;can&nbsp;easily&nbsp;be&nbsp;redirected&nbsp;into&nbsp;a&nbsp;file.&nbsp;While&nbsp;this&nbsp;is&nbsp;how&nbsp;I&nbsp;have&nbsp;used&nbsp;the&nbsp;<br>
+module,&nbsp;you&nbsp;may&nbsp;also&nbsp;find&nbsp;some&nbsp;of&nbsp;the&nbsp;functions&nbsp;useful&nbsp;for&nbsp;your&nbsp;own&nbsp;scripts&nbsp;or&nbsp;<br>
+modules.<br>
+&nbsp;<br>
+&nbsp;<br>
+##&nbsp;Requirements<br>
+&nbsp;<br>
+-&nbsp;(Python&nbsp;3)&nbsp;argparse,&nbsp;numpy,&nbsp;re,&nbsp;sys&nbsp;&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+##&nbsp;Examples<br>
+&nbsp;<br>
+The&nbsp;following&nbsp;command&nbsp;packs&nbsp;the&nbsp;provisional&nbsp;designation&nbsp;"2008&nbsp;EV5"&nbsp;directly&nbsp;from<br>
+the&nbsp;console:<br>
+```<br>
+python&nbsp;MPCdesig.py&nbsp;-p&nbsp;-d&nbsp;"2008&nbsp;EV5"<br>
+K08E05V<br>
+```<br>
+Accepted&nbsp;field&nbsp;separators&nbsp;for&nbsp;input&nbsp;provisional&nbsp;designations&nbsp;are&nbsp;"&nbsp;",&nbsp;"_",&nbsp;"-",&nbsp;<br>
+or&nbsp;none,&nbsp;i.e.&nbsp;2008EV5&nbsp;is&nbsp;also&nbsp;valid.&nbsp;If&nbsp;you&nbsp;have&nbsp;several&nbsp;versions&nbsp;of&nbsp;Python&nbsp;<br>
+installed&nbsp;on&nbsp;your&nbsp;computer&nbsp;and&nbsp;Python&nbsp;3&nbsp;is&nbsp;not&nbsp;the&nbsp;default&nbsp;one,&nbsp;try:<br>
+```<br>
+python3&nbsp;MPCdesig.py&nbsp;-p&nbsp;-d&nbsp;"2008&nbsp;EV5"<br>
+K08E05V<br>
+```<br>
+The&nbsp;quotes&nbsp;are&nbsp;necessary&nbsp;for&nbsp;input&nbsp;provisional&nbsp;designations&nbsp;with&nbsp;more&nbsp;than&nbsp;one&nbsp;<br>
+field&nbsp;and&nbsp;packed&nbsp;designations&nbsp;starting&nbsp;with&nbsp;the&nbsp;character&nbsp;"~",&nbsp;e.g.&nbsp;~0000.&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+To&nbsp;unpack&nbsp;"K08E05V"&nbsp;we&nbsp;use&nbsp;the&nbsp;-u&nbsp;option:&nbsp;<br>
+```<br>
+python&nbsp;MPCdesig.py&nbsp;-u&nbsp;-d&nbsp;K0805V&nbsp;-s&nbsp;"_"<br>
+2008_EV5<br>
+```<br>
+Here&nbsp;we&nbsp;specified&nbsp;"_"&nbsp;as&nbsp;the&nbsp;separator&nbsp;with&nbsp;the&nbsp;-s&nbsp;option.&nbsp;By&nbsp;default,&nbsp;the&nbsp;<br>
+field&nbsp;separator&nbsp;is&nbsp;the&nbsp;SPACE&nbsp;character.&nbsp;If&nbsp;you&nbsp;prefer&nbsp;not&nbsp;to&nbsp;have&nbsp;any&nbsp;<br>
+separator&nbsp;on&nbsp;your&nbsp;provisional&nbsp;designations,&nbsp;simply&nbsp;input&nbsp;an&nbsp;empty&nbsp;string:&nbsp;<br>
+```<br>
+python&nbsp;MPCdesig.py&nbsp;-u&nbsp;-d&nbsp;K08E05V&nbsp;-s&nbsp;""<br>
+2008EV5<br>
+```<br>
+To&nbsp;see&nbsp;how&nbsp;the&nbsp;module&nbsp;deals&nbsp;with&nbsp;a&nbsp;list&nbsp;of&nbsp;designations&nbsp;contained&nbsp;in&nbsp;a&nbsp;file,&nbsp;<br>
+I&nbsp;recommend&nbsp;both&nbsp;packing&nbsp;and&nbsp;unpacking&nbsp;the&nbsp;file&nbsp;**example_list.txt**.&nbsp;After&nbsp;<br>
+examining&nbsp;the&nbsp;file,&nbsp;run&nbsp;both<br>
+```&nbsp;<br>
+python&nbsp;MPCdesig.py&nbsp;-f&nbsp;example_list.txt&nbsp;-u&nbsp;<br>
+```<br>
+and&nbsp;<br>
+```&nbsp;<br>
+python&nbsp;MPCdesig.py&nbsp;-f&nbsp;example_list.txt&nbsp;-p&nbsp;<br>
+```<br>
+and&nbsp;compare&nbsp;the&nbsp;outputs&nbsp;with&nbsp;the&nbsp;input.&nbsp;<br>
+You&nbsp;can&nbsp;see&nbsp;that&nbsp;for&nbsp;input&nbsp;designations&nbsp;that&nbsp;are&nbsp;already&nbsp;unpacked&nbsp;(e.g.&nbsp;the&nbsp;<br>
+first&nbsp;three),&nbsp;the&nbsp;output&nbsp;is&nbsp;the&nbsp;same,&nbsp;either&nbsp;the&nbsp;unpacked&nbsp;form&nbsp;without&nbsp;<br>
+parentheses&nbsp;and&nbsp;without&nbsp;the&nbsp;name&nbsp;or&nbsp;any&nbsp;other&nbsp;strings&nbsp;given&nbsp;afterwards,&nbsp;or&nbsp;the&nbsp;<br>
+1&nbsp;padded&nbsp;with&nbsp;four&nbsp;0s.&nbsp;<br>
+&nbsp;<br>
+&nbsp;<br>
+##&nbsp;Caveat/Warning<br>
+&nbsp;<br>
+The&nbsp;<a href="#-pack">pack</a>()&nbsp;and&nbsp;<a href="#-unpack">unpack</a>()&nbsp;functions&nbsp;will&nbsp;try&nbsp;to&nbsp;convert&nbsp;the&nbsp;first&nbsp;substring&nbsp;that&nbsp;<br>
+is&nbsp;matched&nbsp;on&nbsp;every&nbsp;line&nbsp;so&nbsp;they&nbsp;assume&nbsp;that&nbsp;each&nbsp;line&nbsp;corresponds&nbsp;to&nbsp;one&nbsp;and&nbsp;<br>
+only&nbsp;one&nbsp;asteroid.&nbsp;This&nbsp;does&nbsp;not&nbsp;mean&nbsp;that&nbsp;each&nbsp;line&nbsp;cannot&nbsp;contain&nbsp;more&nbsp;than&nbsp;<br>
+one&nbsp;designations,&nbsp;e.g.&nbsp;"(341843)&nbsp;2008&nbsp;EV5"&nbsp;would&nbsp;be&nbsp;a&nbsp;valid&nbsp;input&nbsp;line.&nbsp;In&nbsp;such<br>
+cases,&nbsp;however,&nbsp;the&nbsp;numbered&nbsp;designation&nbsp;is&nbsp;packed&nbsp;or&nbsp;unpacked.&nbsp;<br>
+&nbsp;<br>
+Although&nbsp;I&nbsp;have&nbsp;tested&nbsp;the&nbsp;module&nbsp;before&nbsp;release,&nbsp;you&nbsp;will&nbsp;surely&nbsp;find&nbsp;bugs&nbsp;and&nbsp;<br>
+cases&nbsp;that&nbsp;should&nbsp;be&nbsp;handled&nbsp;correctly&nbsp;but&nbsp;for&nbsp;which&nbsp;the&nbsp;module&nbsp;will&nbsp;not&nbsp;work.&nbsp;<br>
+Please&nbsp;contact&nbsp;me&nbsp;and&nbsp;I'll&nbsp;do&nbsp;my&nbsp;best&nbsp;to&nbsp;implement&nbsp;fixes&nbsp;quickly,&nbsp;but&nbsp;of&nbsp;course&nbsp;<br>
+you&nbsp;are&nbsp;also&nbsp;welcome&nbsp;to&nbsp;implement&nbsp;them&nbsp;yourself.&nbsp;<br>
+&nbsp;<br>
+Victor&nbsp;Ali&nbsp;Lagoa<br>
+vmalilagoa@gmail.com<br>
+(Munich,&nbsp;May&nbsp;2020)</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="argparse.html">argparse</a><br>
+</td><td width="25%" valign=top><a href="numpy.html">numpy</a><br>
+</td><td width="25%" valign=top><a href="re.html">re</a><br>
+</td><td width="25%" valign=top><a href="sys.html">sys</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-check_packed_unpacked"><strong>check_packed_unpacked</strong></a>(input_desig, compPacked, compUnpacked)</dt><dd><tt>Check&nbsp;if&nbsp;an&nbsp;input&nbsp;designation&nbsp;is&nbsp;a&nbsp;valid&nbsp;one&nbsp;according&nbsp;to&nbsp;the&nbsp;input&nbsp;<br>
+compiled&nbsp;regular&nbsp;expressions&nbsp;(they&nbsp;should&nbsp;match&nbsp;the&nbsp;type&nbsp;of&nbsp;designation&nbsp;you<br>
+are&nbsp;trying&nbsp;to&nbsp;verify,&nbsp;e.g.&nbsp;reNum&nbsp;and&nbsp;reNumPacked&nbsp;for&nbsp;numbered&nbsp;designations).<br>
+See&nbsp;also&nbsp;<a href="#-check_valid_num_desig">check_valid_num_desig</a>()&nbsp;or&nbsp;<a href="#-check_valid_prov_desig">check_valid_prov_desig</a>().&nbsp;<br>
+&nbsp;<br>
+*Input:&nbsp;input_desig&nbsp;is&nbsp;a&nbsp;string&nbsp;or&nbsp;an&nbsp;integer<br>
+*Input:&nbsp;compPacked&nbsp;is&nbsp;a&nbsp;compiled&nbsp;regular&nbsp;expression&nbsp;conceived&nbsp;to&nbsp;find&nbsp;a&nbsp;<br>
+certain&nbsp;type&nbsp;of&nbsp;packed&nbsp;designation,&nbsp;e.g.&nbsp;reNum&nbsp;or&nbsp;reProv<br>
+*Input:&nbsp;compUnpacked&nbsp;is&nbsp;a&nbsp;compiled&nbsp;regular&nbsp;expression&nbsp;conceived&nbsp;to&nbsp;find&nbsp;a&nbsp;<br>
+certain&nbsp;type&nbsp;of&nbsp;unpacked&nbsp;designation,&nbsp;e.g.&nbsp;reNumPacked&nbsp;or&nbsp;reProvPacked<br>
+&nbsp;<br>
+*Return:&nbsp;boolean</tt></dd></dl>
+ <dl><dt><a name="-check_single_unp_prov"><strong>check_single_unp_prov</strong></a>(input_desig)</dt><dd><tt>Check&nbsp;if&nbsp;the&nbsp;input&nbsp;both&nbsp;contain&nbsp;a&nbsp;match&nbsp;for&nbsp;a&nbsp;valid&nbsp;number&nbsp;designation<br>
+and&nbsp;a&nbsp;provisional&nbsp;designation,&nbsp;e.g.&nbsp;"(341843)&nbsp;2008&nbsp;EV5".&nbsp;"2008&nbsp;EV5"&nbsp;will&nbsp;<br>
+produce&nbsp;the&nbsp;same&nbsp;kind&nbsp;of&nbsp;match,&nbsp;so&nbsp;we&nbsp;must&nbsp;compare&nbsp;the&nbsp;matched&nbsp;number&nbsp;with<br>
+the&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;provisional&nbsp;designation.&nbsp;<br>
+&nbsp;<br>
+*Input:&nbsp;an&nbsp;asteroid&nbsp;designation&nbsp;(string&nbsp;or&nbsp;int)<br>
+&nbsp;<br>
+*Return:&nbsp;boolean</tt></dd></dl>
+ <dl><dt><a name="-check_valid_desig"><strong>check_valid_desig</strong></a>(input_des)</dt><dd><tt>This&nbsp;function&nbsp;checks&nbsp;whether&nbsp;the&nbsp;input&nbsp;is&nbsp;a&nbsp;valid&nbsp;asteroid&nbsp;designation.&nbsp;It&nbsp;<br>
+simply&nbsp;encapsulates&nbsp;calls&nbsp;to&nbsp;<a href="#-check_valid_prov_desig">check_valid_prov_desig</a>(),&nbsp;<br>
+<a href="#-check_valid_surv_desig">check_valid_surv_desig</a>()&nbsp;and&nbsp;<a href="#-check_valid_num_desig">check_valid_num_desig</a>().&nbsp;<br>
+&nbsp;<br>
+*Input:&nbsp;an&nbsp;asteroid&nbsp;designation&nbsp;(string&nbsp;or&nbsp;integer)<br>
+&nbsp;<br>
+*Return:&nbsp;boolean</tt></dd></dl>
+ <dl><dt><a name="-check_valid_num_desig"><strong>check_valid_num_desig</strong></a>(input_des)</dt><dd><tt>Check&nbsp;whether&nbsp;the&nbsp;input&nbsp;string&nbsp;or&nbsp;number&nbsp;is&nbsp;a&nbsp;valid&nbsp;numbered&nbsp;designation&nbsp;<br>
+(whether&nbsp;packed&nbsp;or&nbsp;unpacked),&nbsp;e.g.&nbsp;(1)&nbsp;Ceres,&nbsp;(1),&nbsp;1,&nbsp;00001,&nbsp;A1203,&nbsp;101203,<br>
+a1203,&nbsp;361203,&nbsp;~232s&nbsp;are&nbsp;all&nbsp;valid&nbsp;numbered&nbsp;designations.&nbsp;Unlike&nbsp;<br>
+<a href="#-check_valid_prov_desig">check_valid_prov_desig</a>()&nbsp;or&nbsp;<a href="#-check_valid_surv_desig">check_valid_surv_desig</a>(),&nbsp;this&nbsp;does&nbsp;not&nbsp;simply&nbsp;<br>
+call&nbsp;<a href="#-check_packed_unpacked">check_packed_unpacked</a>()&nbsp;because&nbsp;that&nbsp;approach&nbsp;would&nbsp;not&nbsp;work&nbsp;well<br>
+with&nbsp;numbered&nbsp;designations&nbsp;(the&nbsp;reNum&nbsp;will&nbsp;match&nbsp;anything&nbsp;that&nbsp;contains&nbsp;at&nbsp;<br>
+least&nbsp;one&nbsp;digit).<br>
+&nbsp;<br>
+Names&nbsp;or&nbsp;anything&nbsp;written&nbsp;after&nbsp;a&nbsp;matched&nbsp;designation&nbsp;are&nbsp;ignored&nbsp;except<br>
+when&nbsp;they&nbsp;lead&nbsp;to&nbsp;one&nbsp;or&nbsp;more&nbsp;matches.&nbsp;For&nbsp;example,&nbsp;"(1)&nbsp;Ceres"&nbsp;will&nbsp;return<br>
+True,&nbsp;but&nbsp;"(1)&nbsp;Cer3s"&nbsp;will&nbsp;not,&nbsp;because&nbsp;the&nbsp;3&nbsp;will&nbsp;also&nbsp;be&nbsp;matched&nbsp;by&nbsp;the&nbsp;<br>
+regular&nbsp;expression&nbsp;searching&nbsp;for&nbsp;numbered&nbsp;designations&nbsp;and&nbsp;I&nbsp;assume&nbsp;this&nbsp;<br>
+should&nbsp;not&nbsp;happen.&nbsp;This&nbsp;criterion&nbsp;is&nbsp;admittedly&nbsp;arbitrary&nbsp;but&nbsp;it&nbsp;can&nbsp;help&nbsp;<br>
+detect&nbsp;errors&nbsp;in&nbsp;an&nbsp;input&nbsp;list,&nbsp;for&nbsp;example&nbsp;if&nbsp;there&nbsp;are&nbsp;missing&nbsp;carriage&nbsp;<br>
+returns.&nbsp;This&nbsp;also&nbsp;assumes&nbsp;that&nbsp;no&nbsp;"given&nbsp;name"&nbsp;(Ceres,&nbsp;Pallas,&nbsp;...)&nbsp;should<br>
+be&nbsp;or&nbsp;contain&nbsp;a&nbsp;number,&nbsp;but&nbsp;this&nbsp;could&nbsp;be&nbsp;wrong&nbsp;(tbd).&nbsp;<br>
+&nbsp;<br>
+*Input:&nbsp;string&nbsp;or&nbsp;integer<br>
+&nbsp;<br>
+*Return:&nbsp;boolean</tt></dd></dl>
+ <dl><dt><a name="-check_valid_prov_desig"><strong>check_valid_prov_desig</strong></a>(input_desig)</dt><dd><tt>Check&nbsp;whether&nbsp;the&nbsp;input&nbsp;string&nbsp;or&nbsp;number&nbsp;is&nbsp;a&nbsp;valid&nbsp;provisional&nbsp;designation&nbsp;<br>
+(whether&nbsp;packed&nbsp;or&nbsp;unpacked),&nbsp;e.g.&nbsp;2008&nbsp;EV5,&nbsp;2008EV5,&nbsp;...&nbsp;or&nbsp;K08E05V.&nbsp;It&nbsp;<br>
+simply&nbsp;calls&nbsp;<a href="#-check_packed_unpacked">check_packed_unpacked</a>()&nbsp;with&nbsp;the&nbsp;correct&nbsp;compiled&nbsp;regular&nbsp;<br>
+expressions&nbsp;in&nbsp;order&nbsp;to&nbsp;improve&nbsp;legibility&nbsp;and&nbsp;avoid&nbsp;errors.&nbsp;<br>
+See&nbsp;also&nbsp;<a href="#-check_valid_surv_desig">check_valid_surv_desig</a>()&nbsp;and&nbsp;compare&nbsp;with&nbsp;<a href="#-check_valid_num_desig">check_valid_num_desig</a>().<br>
+&nbsp;<br>
+*Input:&nbsp;an&nbsp;asteroid&nbsp;designation&nbsp;(string)<br>
+&nbsp;<br>
+*Return:&nbsp;boolean</tt></dd></dl>
+ <dl><dt><a name="-check_valid_surv_desig"><strong>check_valid_surv_desig</strong></a>(input_desig)</dt><dd><tt>Check&nbsp;whether&nbsp;the&nbsp;input&nbsp;designation&nbsp;is&nbsp;a&nbsp;valid&nbsp;survey&nbsp;designation&nbsp;(packed&nbsp;<br>
+or&nbsp;unpacked).&nbsp;It&nbsp;simply&nbsp;calls&nbsp;<a href="#-check_packed_unpacked">check_packed_unpacked</a>()&nbsp;with&nbsp;the&nbsp;correct&nbsp;<br>
+compiled&nbsp;regular&nbsp;expressions&nbsp;in&nbsp;order&nbsp;to&nbsp;improve&nbsp;legibility&nbsp;and&nbsp;avoid&nbsp;<br>
+errors.&nbsp;See&nbsp;also&nbsp;<a href="#-check_valid_prov_desig">check_valid_prov_desig</a>().<br>
+&nbsp;<br>
+*Input:&nbsp;asteroid&nbsp;designation&nbsp;(string&nbsp;or&nbsp;integer)<br>
+&nbsp;<br>
+*Return:&nbsp;boolean</tt></dd></dl>
+ <dl><dt><a name="-convert"><strong>convert</strong></a>(inp, p_or_unp)</dt><dd><tt>Pack&nbsp;or&nbsp;unpack&nbsp;the&nbsp;input&nbsp;designation&nbsp;or&nbsp;file&nbsp;with&nbsp;designations.&nbsp;This&nbsp;is&nbsp;<br>
+simply&nbsp;the&nbsp;<a href="#-main">main</a>()&nbsp;function&nbsp;but&nbsp;without&nbsp;using&nbsp;the&nbsp;argument&nbsp;parser&nbsp;and&nbsp;a&nbsp;<br>
+hard-coded&nbsp;default&nbsp;separator&nbsp;(the&nbsp;underscore&nbsp;character).&nbsp;This&nbsp;means&nbsp;that&nbsp;<br>
+the&nbsp;second&nbsp;argument&nbsp;must&nbsp;exactly&nbsp;be&nbsp;either&nbsp;"pack"&nbsp;or&nbsp;"unpack",&nbsp;otherwise&nbsp;it&nbsp;<br>
+will&nbsp;not&nbsp;work.&nbsp;Another&nbsp;issue&nbsp;is&nbsp;that&nbsp;it&nbsp;also&nbsp;does&nbsp;not&nbsp;have&nbsp;the&nbsp;same&nbsp;error&nbsp;<br>
+handling&nbsp;as&nbsp;the&nbsp;<a href="#-main">main</a>()&nbsp;function,&nbsp;so&nbsp;I&nbsp;do&nbsp;not&nbsp;recommend&nbsp;its&nbsp;use&nbsp;as&nbsp;a&nbsp;black&nbsp;<br>
+box.&nbsp;However,&nbsp;it&nbsp;could&nbsp;be&nbsp;a&nbsp;good&nbsp;template&nbsp;for&nbsp;creating&nbsp;your&nbsp;own&nbsp;"convert"&nbsp;<br>
+function(s)&nbsp;in&nbsp;your&nbsp;own&nbsp;script(s)&nbsp;or&nbsp;module(s).&nbsp;<br>
+&nbsp;<br>
+*Input:&nbsp;asteroid&nbsp;designation&nbsp;or&nbsp;a&nbsp;file&nbsp;with&nbsp;asteroid&nbsp;designations<br>
+*Input:&nbsp;"pack"&nbsp;or&nbsp;"unpack"&nbsp;(no&nbsp;other&nbsp;strings&nbsp;are&nbsp;valid)<br>
+&nbsp;<br>
+*Return:&nbsp;string&nbsp;with&nbsp;output&nbsp;or&nbsp;an&nbsp;error&nbsp;message</tt></dd></dl>
+ <dl><dt><a name="-does_it_match_re"><strong>does_it_match_re</strong></a>(input_desig, comp_re)</dt><dd><tt>Check&nbsp;whether&nbsp;the&nbsp;input&nbsp;asteroid&nbsp;designation&nbsp;is&nbsp;matched&nbsp;by&nbsp;the&nbsp;input&nbsp;<br>
+compiled&nbsp;regular&nbsp;expressions.<br>
+&nbsp;<br>
+*Input:&nbsp;an&nbsp;asteroid&nbsp;designation&nbsp;(string&nbsp;or&nbsp;integer)<br>
+*Input:&nbsp;a&nbsp;compiled&nbsp;regular&nbsp;expression<br>
+&nbsp;<br>
+*Return:&nbsp;boolean</tt></dd></dl>
+ <dl><dt><a name="-is_it_valid_packed_survey"><strong>is_it_valid_packed_survey</strong></a>(input_desig)</dt><dd><tt>Obsolete.</tt></dd></dl>
+ <dl><dt><a name="-is_it_valid_unpacked_survey"><strong>is_it_valid_unpacked_survey</strong></a>(input_desig)</dt><dd><tt>Obsolete.</tt></dd></dl>
+ <dl><dt><a name="-main"><strong>main</strong></a>()</dt></dl>
+ <dl><dt><a name="-pack"><strong>pack</strong></a>(input_desig)</dt><dd><tt>Call&nbsp;the&nbsp;necessary&nbsp;function&nbsp;for&nbsp;packing&nbsp;the&nbsp;input&nbsp;designation&nbsp;after&nbsp;some&nbsp;<br>
+checks.&nbsp;If&nbsp;the&nbsp;input&nbsp;designation&nbsp;is&nbsp;already&nbsp;a&nbsp;valid&nbsp;packed&nbsp;designation,&nbsp;it&nbsp;<br>
+returns&nbsp;it.&nbsp;<br>
+&nbsp;<br>
+*Input:&nbsp;an&nbsp;asteroid&nbsp;designation&nbsp;(string&nbsp;or&nbsp;int)<br>
+&nbsp;<br>
+*Return:&nbsp;an&nbsp;unpacked&nbsp;asteroid&nbsp;designation&nbsp;(string)&nbsp;or&nbsp;error&nbsp;message</tt></dd></dl>
+ <dl><dt><a name="-pack_base_62"><strong>pack_base_62</strong></a>(num_desig)</dt><dd><tt>Pack&nbsp;a&nbsp;numbered&nbsp;designation&nbsp;greater&nbsp;than&nbsp;619999&nbsp;following&nbsp;the&nbsp;Minor&nbsp;<br>
+Planet&nbsp;Center's&nbsp;description.<br>
+&nbsp;<br>
+*Input:&nbsp;a&nbsp;valid&nbsp;numbered&nbsp;designation&nbsp;(string&nbsp;or&nbsp;integer)<br>
+*Return:&nbsp;a&nbsp;string&nbsp;with&nbsp;the&nbsp;corresponding&nbsp;packed&nbsp;designation&nbsp;or&nbsp;an&nbsp;error&nbsp;<br>
+message</tt></dd></dl>
+ <dl><dt><a name="-pack_num"><strong>pack_num</strong></a>(input_desig)</dt><dd><tt>Pack&nbsp;an&nbsp;input&nbsp;numbered&nbsp;asteroid&nbsp;designation,&nbsp;e.g.&nbsp;(1)&nbsp;Ceres,&nbsp;or&nbsp;1&nbsp;Ceres.&nbsp;If<br>
+the&nbsp;input&nbsp;is&nbsp;already&nbsp;a&nbsp;valid&nbsp;numbered&nbsp;designation&nbsp;it&nbsp;returns&nbsp;it&nbsp;back.&nbsp;<br>
+&nbsp;<br>
+*Input:&nbsp;a&nbsp;valid&nbsp;asteroid&nbsp;number&nbsp;designation&nbsp;(string&nbsp;or&nbsp;a&nbsp;number)<br>
+&nbsp;<br>
+*Return:&nbsp;string&nbsp;with&nbsp;the&nbsp;MPC-packed&nbsp;designation&nbsp;or&nbsp;an&nbsp;error&nbsp;message</tt></dd></dl>
+ <dl><dt><a name="-pack_prov"><strong>pack_prov</strong></a>(input_desig)</dt><dd><tt>Pack&nbsp;an&nbsp;input&nbsp;designation&nbsp;if&nbsp;it&nbsp;is&nbsp;a&nbsp;valid&nbsp;provisional&nbsp;asteroid&nbsp;<br>
+designation.&nbsp;For&nbsp;example,&nbsp;<br>
+&nbsp;<br>
+input&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;output<br>
+---------------------<br>
+2008_SO254&nbsp;&nbsp;K08SP4O<br>
+2008&nbsp;SO254&nbsp;&nbsp;K08SP4O<br>
+2008-SO254&nbsp;&nbsp;K08SP4O<br>
+2008SO254&nbsp;&nbsp;&nbsp;K08SP4O<br>
+&nbsp;<br>
+If&nbsp;it&nbsp;is&nbsp;already&nbsp;a&nbsp;packed&nbsp;provisional&nbsp;designation,&nbsp;it&nbsp;outputs&nbsp;it.&nbsp;<br>
+Otherwise,&nbsp;it&nbsp;returns&nbsp;an&nbsp;error&nbsp;message.&nbsp;<br>
+&nbsp;<br>
+*Input:&nbsp;an&nbsp;asteroid&nbsp;designation&nbsp;(string&nbsp;or&nbsp;integer)<br>
+&nbsp;<br>
+*Return:&nbsp;a&nbsp;string&nbsp;with&nbsp;the&nbsp;packed&nbsp;form&nbsp;of&nbsp;the&nbsp;input&nbsp;or&nbsp;an&nbsp;error&nbsp;message</tt></dd></dl>
+ <dl><dt><a name="-pack_survey"><strong>pack_survey</strong></a>(input_desig)</dt><dd><tt>Pack&nbsp;a&nbsp;special&nbsp;survey&nbsp;asteroid&nbsp;designation.<br>
+&nbsp;<br>
+*Input:&nbsp;an&nbsp;asteroid&nbsp;designation<br>
+&nbsp;<br>
+*Return:&nbsp;a&nbsp;string&nbsp;with&nbsp;the&nbsp;packed&nbsp;designation&nbsp;or&nbsp;an&nbsp;error&nbsp;message</tt></dd></dl>
+ <dl><dt><a name="-to_str"><strong>to_str</strong></a>(input_desig)</dt><dd><tt>Remove&nbsp;the&nbsp;leading&nbsp;and&nbsp;trailing&nbsp;space&nbsp;characters&nbsp;from&nbsp;the&nbsp;input&nbsp;string&nbsp;<br>
+&nbsp;<br>
+*Return:&nbsp;string</tt></dd></dl>
+ <dl><dt><a name="-unpack"><strong>unpack</strong></a>(input_desig, separator)</dt><dd><tt>Call&nbsp;the&nbsp;necessary&nbsp;function&nbsp;for&nbsp;unpacking&nbsp;the&nbsp;input&nbsp;after&nbsp;some&nbsp;checks.&nbsp;<br>
+If&nbsp;the&nbsp;input&nbsp;designation&nbsp;is&nbsp;already&nbsp;a&nbsp;valid&nbsp;unpacked&nbsp;designation,&nbsp;it&nbsp;<br>
+returns&nbsp;it.&nbsp;<br>
+&nbsp;<br>
+*Input:&nbsp;an&nbsp;asteroid&nbsp;designation&nbsp;(string&nbsp;or&nbsp;int)<br>
+*Input:&nbsp;character&nbsp;to&nbsp;be&nbsp;used&nbsp;to&nbsp;separate&nbsp;provisional&nbsp;designations<br>
+&nbsp;<br>
+*Return:&nbsp;an&nbsp;unpacked&nbsp;asteroid&nbsp;designation&nbsp;(string)&nbsp;or&nbsp;an&nbsp;error&nbsp;message</tt></dd></dl>
+ <dl><dt><a name="-unpack_base_62"><strong>unpack_base_62</strong></a>(packed_desig)</dt><dd><tt>Unpack&nbsp;a&nbsp;numbered&nbsp;designation&nbsp;greater&nbsp;than&nbsp;619999&nbsp;(e.g.&nbsp;"~12z3")&nbsp;following&nbsp;<br>
+the&nbsp;Minor&nbsp;Planet&nbsp;Center's&nbsp;specification.&nbsp;<br>
+&nbsp;<br>
+*Input:&nbsp;a&nbsp;valid&nbsp;packed&nbsp;numbered&nbsp;designation&nbsp;(string&nbsp;or&nbsp;integer)<br>
+&nbsp;<br>
+*Return:&nbsp;string&nbsp;with&nbsp;the&nbsp;corresponding&nbsp;unpacked&nbsp;designation&nbsp;or&nbsp;an&nbsp;error&nbsp;<br>
+message</tt></dd></dl>
+ <dl><dt><a name="-unpack_num"><strong>unpack_num</strong></a>(input_desig)</dt><dd><tt>Return&nbsp;the&nbsp;unpacked&nbsp;version&nbsp;of&nbsp;the&nbsp;input&nbsp;number&nbsp;designation&nbsp;if&nbsp;it&nbsp;is&nbsp;<br>
+a&nbsp;valid&nbsp;packed&nbsp;one,&nbsp;or&nbsp;the&nbsp;very&nbsp;input&nbsp;if&nbsp;it&nbsp;is&nbsp;a&nbsp;valid&nbsp;unpacked&nbsp;one.&nbsp;<br>
+It&nbsp;returns&nbsp;an&nbsp;error&nbsp;message&nbsp;otherwise.&nbsp;<br>
+&nbsp;<br>
+*Input:&nbsp;asteroid&nbsp;designation&nbsp;(string&nbsp;or&nbsp;int)<br>
+&nbsp;<br>
+*Return:&nbsp;unpacked&nbsp;designation&nbsp;or&nbsp;error&nbsp;message</tt></dd></dl>
+ <dl><dt><a name="-unpack_prov"><strong>unpack_prov</strong></a>(input_desig, separator)</dt><dd><tt>Return&nbsp;the&nbsp;unpacked&nbsp;version&nbsp;of&nbsp;the&nbsp;input&nbsp;provisional&nbsp;designation&nbsp;if&nbsp;<br>
+it&nbsp;is&nbsp;a&nbsp;valid&nbsp;packed&nbsp;one,&nbsp;or&nbsp;the&nbsp;very&nbsp;input&nbsp;if&nbsp;it&nbsp;is&nbsp;a&nbsp;valid&nbsp;unpacked&nbsp;one.<br>
+&nbsp;<br>
+*Input:&nbsp;an&nbsp;asteroid&nbsp;designation&nbsp;(string&nbsp;or&nbsp;integer)<br>
+*Input:&nbsp;a&nbsp;character&nbsp;that&nbsp;will&nbsp;be&nbsp;used&nbsp;as&nbsp;separator&nbsp;in&nbsp;the&nbsp;output&nbsp;provisional<br>
+designation<br>
+&nbsp;<br>
+*Return:&nbsp;unpacked&nbsp;provisional&nbsp;designation&nbsp;(str)&nbsp;or&nbsp;an&nbsp;error&nbsp;message</tt></dd></dl>
+ <dl><dt><a name="-unpack_survey"><strong>unpack_survey</strong></a>(input_desig)</dt><dd><tt>Unpack&nbsp;a&nbsp;special&nbsp;survey&nbsp;asteroid&nbsp;designation.<br>
+&nbsp;<br>
+*Input:&nbsp;an&nbsp;asteroid&nbsp;designation<br>
+&nbsp;<br>
+*Return:&nbsp;a&nbsp;string&nbsp;with&nbsp;the&nbsp;packed&nbsp;designation&nbsp;or&nbsp;an&nbsp;error&nbsp;message</tt></dd></dl>
+</td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#55aa55">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><strong>argParserMPC</strong> = ArgumentParser(prog='pydoc3', usage=None, descri...atter'&gt;, conflict_handler='error', add_help=True)<br>
+<strong>p2unp_num</strong> = {'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15', 'G': '16', 'H': '17', 'I': '18', 'J': '19', ...}<br>
+<strong>p2unp_prov</strong> = {'I': '18', 'J': '19', 'K': '20'}<br>
+<strong>re6digits</strong> = re.compile('\\b(\\d{2,})(\\d{4})\\b')<br>
+<strong>reNum</strong> = re.compile('^[\\(]?(\\d{1,8})\\)?\\b')<br>
+<strong>rePackedLong</strong> = re.compile('(\\~)([0-9a-zA-Z]{4})\\b')<br>
+<strong>rePackedNum</strong> = re.compile('\\b([~a-zA-Z])(\\d{4})\\b')<br>
+<strong>rePackedProv</strong> = re.compile('\\b([IJK])(\\d{2})([A-Z])([a-zA-Z0-9])(\\d)([A-Z])\\b')<br>
+<strong>rePackedSurv</strong> = re.compile('\\b([PT]{1})([L123]{1})S(\\d{4})\\b')<br>
+<strong>reProv</strong> = re.compile('\\b(\\d{4})([- _]?)([a-zA-Z]{2})(\\d*)\\b')<br>
+<strong>reSurv</strong> = re.compile('\\b(\\d{4})[- _]([PT]{1})-([L123]{1})\\b')<br>
+<strong>unp2p_num</strong> = {'00': '0', '10': 'A', '11': 'B', '12': 'C', '13': 'D', '14': 'E', '15': 'F', '16': 'G', '17': 'H', '18': 'I', ...}<br>
+<strong>unp2p_prov</strong> = {'18': 'I', '19': 'J', '20': 'K'}<br>
+<strong>vers</strong> = '3.5.2'</td></tr></table>
+</body></html>

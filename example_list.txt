@@ -1,0 +1,22 @@
+ 1  Ceres
+(1) Ceres
+(1) (Actually, anything after the matched number is ignored but)
+a333 Badenia (a leading 'a' for 'asteroid' is not accepted)
+
+00001
+
+123456  These two are the same, one unpacked, the other one packed
+ C3456
+
+360000  Idem
+ a0000
+
+619999  
+620000    First number packed with the "~" format
+14346038  Another "randomly chosen" example
+
+ 2008EV5
+2008-EV5
+2008_EV5
+K08E05V
+(341843) 2008 EV5. In this case, the numbered designation is given preference
