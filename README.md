@@ -80,7 +80,7 @@ parentheses and without the name or any other strings given afterwards, or the
 
 The pack() and unpack() functions assume that each line corresponds to one and 
 only one asteroid and will convert the first substring that produces a match. 
-This does not mean that each line cannot contain more than one designatione, 
+This does not mean that each line cannot contain more than one designation, 
 e.g. "(341843) 2008 EV5" and "(8) Flora" would be valid input lines. In such
 cases, however, only the numbered designations will be packed or unpacked. 
 
