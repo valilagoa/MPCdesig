@@ -97,6 +97,7 @@ vmalilagoa@gmail.com
 """
 
 import sys
+
 version_string = ".".join(map(str, sys.version_info[:3]))
 
 try:
@@ -198,8 +199,10 @@ rePackedNum = re.compile(r"\b([~a-zA-Z])(\d{4})\b")
 # but not A343 or g34343
 
 # Capture the first group of numbers before the last four:
-reProv = re.compile("\\b(\\d{4})([- _]?)([a-zA-Z]{2})(\\d*)\\b")
-rePackedProv = re.compile("\\b([IJK])(\\d{2})([A-Z])([a-zA-Z0-9])(\\d)([A-Z])\\b")
+re_provisional_designation = \
+    re.compile("\\b(\\d{4})([- _]?)([a-zA-Z]{2})(\\d*)\\b")
+re_packed_provisional_designation = \
+    re.compile("\\b([IJK])(\\d{2})([A-Z])([a-zA-Z0-9])(\\d)([A-Z])\\b")
 re_survey = re.compile(r"\b(\d{4})[- _]([PT])-([L123])\b")
 re_packed_survey = re.compile(r"\b([PT])([L123])S(\d{4})\b")
 re6digits = re.compile("\\b(\\d{2,})(\\d{4})\\b")
@@ -235,7 +238,7 @@ def is_valid_survey_designation(designation: str) -> bool:
 
     try:
         designation: str = str(designation).strip()
-        return check_packed_unpacked(designation, re_survey, re_packed_survey)
+        return is_packed_or_unpacked(designation, re_survey, re_packed_survey)
     except AttributeError:
         return False
 
@@ -304,7 +307,7 @@ def check_valid_num_desig(designation: str) -> bool:
         return False
 
 
-def check_valid_prov_desig(input_desig: str) -> bool:
+def is_valid_provisional_designation(designation: str) -> bool:
     """
     Check whether the input string or number is a valid provisional designation 
     (whether packed or unpacked), e.g. 2008 EV5, 2008EV5, ... or K08E05V. It 
@@ -318,13 +321,15 @@ def check_valid_prov_desig(input_desig: str) -> bool:
     """
 
     try:
-        input_str = str(input_desig).strip()
-        return check_packed_unpacked(input_str, reProv, rePackedProv)
+        designation: str = str(designation).strip()
+        return is_packed_or_unpacked(designation,
+                                     re_provisional_designation,
+                                     re_packed_provisional_designation)
     except AttributeError:
         return False
 
 
-def check_valid_desig(input_des):
+def check_valid_desig(designation):
     """
     This function checks whether the input is a valid asteroid designation. It 
     simply encapsulates calls to check_valid_prov_desig(), 
@@ -335,13 +340,11 @@ def check_valid_desig(input_des):
     *Return: boolean
     """
 
-    input_desig = str(input_des)
-
-    if check_valid_prov_desig(input_desig):
+    if is_valid_provisional_designation(designation):
         return True
-    elif is_valid_survey_designation(input_desig):
+    elif is_valid_survey_designation(designation):
         return True
-    elif check_valid_num_desig(input_desig):
+    elif check_valid_num_desig(designation):
         return True
     else:
         return False
@@ -374,7 +377,9 @@ def designation_matches_compiled_re(designation: str, compiled_re: re) -> bool:
     return it_matches
 
 
-def check_packed_unpacked(input_str, compPacked, compUnpacked):
+def is_packed_or_unpacked(designation: str,
+                          packed_compiled_re: re,
+                          unpacked_compiled_re: re) -> bool:
     """
     Check if an input designation is a valid one according to the input 
     compiled regular expressions (they should match the type of designation you
@@ -390,14 +395,8 @@ def check_packed_unpacked(input_str, compPacked, compUnpacked):
     *Return: boolean
     """
 
-    # fa_match=compPacked.findall(input_str)
-
-    if designation_matches_compiled_re(input_str, compPacked):
-        return True
-    elif designation_matches_compiled_re(input_str, compUnpacked):
-        return True
-    else:
-        return False
+    return designation_matches_compiled_re(designation, packed_compiled_re) or designation_matches_compiled_re(
+        designation, unpacked_compiled_re)
 
 
 def check_single_unp_prov(input_desig):
@@ -414,9 +413,9 @@ def check_single_unp_prov(input_desig):
     final_c = False
 
     input_d = str(input_desig).strip()
-    if check_valid_prov_desig(input_d) and check_valid_num_desig(input_d):
+    if is_valid_provisional_designation(input_d) and check_valid_num_desig(input_d):
 
-        fa_match = reProv.findall(input_d)
+        fa_match = re_provisional_designation.findall(input_d)
         if fa_match:
             first_part = fa_match[0][0]
         else:
@@ -585,9 +584,9 @@ def pack_prov(input_desig):
         input_desig)
 
     input_str = to_str(input_desig)
-    if check_valid_prov_desig(input_str):
+    if is_valid_provisional_designation(input_str):
 
-        fa_match = reProv.findall(input_str)
+        fa_match = re_provisional_designation.findall(input_str)
         if fa_match and len(fa_match) == 1:
             # It must have worked:
             # so fa_match must be of the form:
@@ -614,7 +613,7 @@ def pack_prov(input_desig):
 
         else:
             # It might be already packed:
-            fa_match = rePackedProv.findall(input_str)
+            fa_match = re_packed_provisional_designation.findall(input_str)
             if fa_match and len(fa_match) == 1:
                 return input_str
             else:
@@ -640,14 +639,14 @@ def unpack_prov(input_desig, separator):
         input_desig)
 
     input_str = re.sub("[ _]", "-", to_str(input_desig), count=1)
-    if check_valid_prov_desig(input_str):
-        fa_match = reProv.findall(input_str)
+    if is_valid_provisional_designation(input_str):
+        fa_match = re_provisional_designation.findall(input_str)
         if fa_match and len(fa_match) == 1:
             # it is a valid provisional designation, already unpacked, so
             # we just insert the input separator
             return fa_match[0][0] + separator + fa_match[0][2] + fa_match[0][3]
 
-        fa_match = rePackedProv.findall(input_desig)
+        fa_match = re_packed_provisional_designation.findall(input_desig)
         frst_y = p2unp_prov[fa_match[0][0]]
         scnd_y = fa_match[0][1]
         frst_fn = fa_match[0][2]
@@ -748,7 +747,7 @@ def unpack(input_desig, separator):
             return unpack_survey_desig(input_d)
     elif check_valid_num_desig(input_d) and not single_provis:
         return unpack_num(input_d)
-    elif check_valid_prov_desig(input_d):
+    elif is_valid_provisional_designation(input_d):
         return unpack_prov(input_d, str(separator))
 
     else:
@@ -777,7 +776,7 @@ def pack(input_desig):
         return pack_survey_desig(input_d)
     elif check_valid_num_desig(input_d) and not (single_provis):
         return pack_num(input_d)
-    elif check_valid_prov_desig(input_d):
+    elif is_valid_provisional_designation(input_d):
         return pack_prov(input_d)
     else:
         return errmssg
