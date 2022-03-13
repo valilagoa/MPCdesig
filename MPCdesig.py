@@ -96,18 +96,17 @@ vmalilagoa@gmail.com
  
 """
 
+import sys
+version_string = ".".join(map(str, sys.version_info[:3]))
+
 try:
-    import sys
-
-    vers = ".".join(map(str, sys.version_info[:3]))
-
     import numpy as np
     import re
     import argparse
-#    import datetime
+
 except:
     print("\n*****\npython {0}: {1}\n*****\n".format(
-        vers, sys.exc_info()[1])
+        version_string, sys.exc_info()[1])
     )
     sys.exit(-1)
 
