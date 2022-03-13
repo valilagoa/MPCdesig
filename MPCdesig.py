@@ -237,7 +237,7 @@ def check_valid_surv_desig(input_desig):
     """
 
     try:
-        input_str = to_str(input_desig)
+        input_str = str(input_desig).strip()
         return check_packed_unpacked(input_str, reSurv, rePackedSurv)
     except:
         return False
