@@ -20,7 +20,7 @@ The module is more easily used as a script, i.e. directly from the console with
 a command specifying your input designation or the name of a file containing 
 designations (see the Examples section below). The output simply goes to stdout 
 and can easily be redirected into a file. While this is how I have used the 
-module, you may also find some of the functions useful for your own scripts or 
+module, you may also find some functions useful for your own scripts or 
 modules.
 
 
@@ -82,12 +82,12 @@ parentheses and without the name or any other strings given afterwards, or the
 The pack() and unpack() functions will try to convert the first substring that 
 is matched on every line so they assume that each line corresponds to one and 
 only one asteroid. This does not mean that each line cannot contain more than 
-one designations, e.g. "(341843) 2008 EV5" would be a valid input line. In such
+one designation, e.g. "(341843) 2008 EV5" would be a valid input line. In such
 cases, however, the numbered designation is packed or unpacked. 
 
 Although I have tested the module before release, you will surely find bugs and 
 cases that should be handled correctly but for which the module will not work. 
-Please contact me and I'll do my best to implement fixes quickly, but of course 
+Please contact me, and I'll do my best to implement fixes quickly. Of course,
 you are also welcome to implement them yourself. 
 
 Victor Ali Lagoa
@@ -206,7 +206,7 @@ re_packed_provisional_designation = \
 re_survey = re.compile(r"\b(\d{4})[- _]([PT])-([L123])\b")
 re_packed_survey = re.compile(r"\b([PT])([L123])S(\d{4})\b")
 re6digits = re.compile(r"\b(\d{2,})(\d{4})\b")
-rePackedLong = re.compile(r"(\~)([0-9a-zA-Z]{4})\b")
+rePackedLong = re.compile(r"(~)([0-9a-zA-Z]{4})\b")
 
 
 ###############################################################################
@@ -272,8 +272,8 @@ def check_valid_num_desig(designation: str) -> bool:
     Names or anything written after a matched designation are ignored except
     when they lead to one or more matches. For example, "(1) Ceres" will return
     True, but "(1) Cer3s" will not, because the 3 will also be matched by the 
-    regular expression searching for numbered designations and I assume this 
-    should not happen. This criterion is admittedly arbitrary but it can help 
+    regular expression searching for numbered designations, and I assume this
+    should not happen. This criterion is admittedly arbitrary, but it can help
     detect errors in an input list, for example if there are missing carriage 
     returns. This also assumes that no "given name" (Ceres, Pallas, ...) should
     be or contain a number, but this could be wrong (tbd). 
@@ -469,11 +469,11 @@ def unpack_base_62(packed_desig):
     *Return: string with the corresponding unpacked designation or an error 
     message
     """
-    errmssg = "Error. {0} is not a valid packed long numbered designation".format(
+    error_message = "Error. {0} is not a valid packed long numbered designation".format(
         packed_desig)
 
     if not (designation_matches_compiled_re(packed_desig, rePackedLong)):
-        return "unpack_base_62(): {0}".format(errmssg)
+        return "unpack_base_62(): {0}".format(error_message)
 
     suma = 0
     packed_desig = str(packed_desig).strip()
@@ -497,7 +497,7 @@ def pack_num(input_desig):
     *Return: string with the MPC-packed designation or an error message
     """
 
-    errmssg = """pack_num() error: '{0}' not valid for packing""".format(
+    error_message = """pack_num() error: '{0}' not valid for packing""".format(
         input_desig)
 
     input_str = to_str(input_desig)
@@ -511,7 +511,7 @@ def pack_num(input_desig):
                 return pack_base_62(num)
 
             elif num > 99999:
-                # we regex for the two groups to pack the first two digits:
+                # regex for the two groups to pack the first two digits:
                 fa_long = re6digits.findall(input_str)
                 pref = unp2p_num[fa_long[0][0]]
                 return pref + fa_long[0][1]
@@ -520,11 +520,11 @@ def pack_num(input_desig):
                 return "{0:05d}".format(num)
 
         except:
-            # the int() failed so it should be a valid packed desig
+            # the int() failed, so it should be a valid packed designation
             return input_desig
     else:
-        # print(errmssg)
-        return errmssg
+        # print(error_message)
+        return error_message
 
 
 def unpack_num(input_desig):
@@ -538,7 +538,7 @@ def unpack_num(input_desig):
     *Return: unpacked designation or error message
     """
 
-    errmssg = """unpack_num(): Error. '{0}' not valid for unpacking""".format(
+    error_message = """unpack_num(): Error. '{0}' not valid for unpacking""".format(
         input_desig)
 
     input_str = to_str(input_desig)
@@ -556,8 +556,8 @@ def unpack_num(input_desig):
                 return "{0:d}".format(int(fa_match[0]))
 
     else:
-        # print(errmssg)
-        return errmssg
+        # print(error_message)
+        return error_message
 
 
 def pack_prov(input_desig):
@@ -579,7 +579,7 @@ def pack_prov(input_desig):
     *Return: a string with the packed form of the input or an error message
     """
 
-    errmssg = """pack_prov(): Error. '{0}' not valid for packing""".format(
+    error_message = """pack_prov(): Error. '{0}' not valid for packing""".format(
         input_desig)
 
     input_str = to_str(input_desig)
@@ -616,10 +616,10 @@ def pack_prov(input_desig):
             if fa_match and len(fa_match) == 1:
                 return input_str
             else:
-                return errmssg
+                return error_message
     else:
-        # print(errmssg)
-        return errmssg
+        # print(error_message)
+        return error_message
 
 
 def unpack_prov(input_desig, separator):
@@ -633,7 +633,7 @@ def unpack_prov(input_desig, separator):
     *Return: unpacked provisional designation (str) or an error message
     """
 
-    errmssg = """unpack_prov(): Error. '{0}' not valid for unpacking""".format(
+    error_message = """unpack_prov(): Error. '{0}' not valid for unpacking""".format(
         input_desig)
 
     input_str = re.sub("[ _]", "-", to_str(input_desig), count=1)
@@ -664,8 +664,8 @@ def unpack_prov(input_desig, separator):
 
         return frst_y + scnd_y + separator + frst_fn + scnd_fn + n1 + n2
     else:
-        # print(errmssg)
-        return errmssg
+        # print(error_message)
+        return error_message
 
 
 def pack_survey_desig(input_desig):
@@ -677,12 +677,12 @@ def pack_survey_desig(input_desig):
     *Return: a string with the packed designation or an error message
     """
 
-    errmssg = "{0} is not a valid special survey designation".format(input_desig)
+    error_message = "{0} is not a valid special survey designation".format(input_desig)
 
     des = to_str(input_desig)
 
     if des.isdigit():
-        return "pack_survey_desig(): Error. {0}".format(errmssg)
+        return "pack_survey_desig(): Error. {0}".format(error_message)
 
     try:
         numbers = des[0:4]
@@ -690,7 +690,7 @@ def pack_survey_desig(input_desig):
         lett2 = des[7]
         return lett1 + lett2 + "S" + numbers
     except:
-        return "pack_survey_desig(): Error. {0}".format(errmssg)
+        return "pack_survey_desig(): Error. {0}".format(error_message)
 
 
 def unpack_survey_desig(input_desig):
@@ -702,13 +702,13 @@ def unpack_survey_desig(input_desig):
     *Return: a string with the packed designation or an error message
     """
 
-    errmssg = "{0} is not a valid special survey designation".format(input_desig)
+    error_message = "{0} is not a valid special survey designation".format(input_desig)
 
     des = to_str(input_desig)
 
     if des.isdigit():
         # This should not happen, by definition
-        return "unpack_survey_desig(): Error. {0}".format(errmssg)
+        return "unpack_survey_desig(): Error. {0}".format(error_message)
 
     try:
         numbers = des[3:]
@@ -716,7 +716,7 @@ def unpack_survey_desig(input_desig):
         lett2 = des[1]
         return numbers + " " + lett1 + "-" + lett2
     except:
-        return "unpack_survey_desig(): Error. {0}".format(errmssg)
+        return "unpack_survey_desig(): Error. {0}".format(error_message)
 
 
 def unpack(input_desig, separator):
@@ -731,7 +731,7 @@ def unpack(input_desig, separator):
     *Return: an unpacked asteroid designation (string) or an error message
     """
 
-    errmssg = """unpack(): Error. '{0}' not valid for unpacking""".format(
+    error_message = """unpack(): Error. '{0}' not valid for unpacking""".format(
         input_desig)
 
     input_d = to_str(input_desig)
@@ -749,8 +749,8 @@ def unpack(input_desig, separator):
         return unpack_prov(input_d, str(separator))
 
     else:
-        # print(errmssg)
-        return errmssg
+        # print(error_message)
+        return error_message
 
 
 def pack(input_desig):
@@ -764,7 +764,7 @@ def pack(input_desig):
     *Return: an unpacked asteroid designation (string) or error message
     """
 
-    errmssg = """pack(): Error. '{0}' not valid for packing""".format(input_desig)
+    error_message = """pack(): Error. '{0}' not valid for packing""".format(input_desig)
 
     input_d = to_str(input_desig)
 
@@ -777,7 +777,7 @@ def pack(input_desig):
     elif is_valid_provisional_designation(input_d):
         return pack_prov(input_d)
     else:
-        return errmssg
+        return error_message
 
 
 def convert(inp, p_or_unp):
@@ -799,27 +799,27 @@ def convert(inp, p_or_unp):
 
     input_ = str(inp)
     if len(input_) > 0 and check_valid_desig(input_):
-        desigs = [input_]
+        designations = [input_]
         # Create a list with the input so that we can iterate over it
     else:
         try:
             # Perhaps it is an input filename, not a designation
             myfile = open(input_, 'r')
-            desigs = myfile.readlines()
+            designations = myfile.readlines()
             myfile.close()
         except IOError:
             print("convert(): Error. Did not find file '{0}'".format(input_))
-            desigs = []
+            designations = []
             # We still need an empty list to iterate over next
 
-    for ides in desigs:
-        if len(ides.split()) < 1:
+    for designation in designations:
+        if len(designation.split()) < 1:
             print("convert(): Warning. Input is an empty line")
         else:
             if p_or_unp == "pack":
-                print(pack(ides.replace("\n", "")))
+                print(pack(designation.replace("\n", "")))
             elif p_or_unp == "unpack":
-                print(unpack(ides.replace("\n", ""), "_"))
+                print(unpack(designation.replace("\n", ""), "_"))
             else:
                 print("convert(): Error. 2nd arg. must be 'pack' or 'unpack'")
 
@@ -833,14 +833,14 @@ def main():
 
     if parsed.desig:
         # if we parsed a designation, we have a list with one element
-        desigs = [parsed.desig]
+        designations = [parsed.desig]
 
     elif parsed.filename:
         filename = str(parsed.filename)
         # we expect a file with many desigs
         try:
             openfile = open(filename, 'r')
-            desigs = openfile.readlines()
+            designations = openfile.readlines()
             openfile.close()
         except IOError:
             print("main(): Error. Did not find file '{0}'\n".format(filename))
@@ -852,14 +852,14 @@ def main():
     #
     # If we made it here, we have at least one designation to try to convert
     #
-    for ides in desigs:
-        if len(ides.split()) < 1:
+    for designation in designations:
+        if len(designation.split()) < 1:
             print("main(): Warning. Empty line")
         else:
             if parsed.pack:
-                print(pack(ides.replace("\n", "")))
+                print(pack(designation.replace("\n", "")))
             elif parsed.unpack:
-                print(unpack(ides.replace("\n", ""), parsed.separator))
+                print(unpack(designation.replace("\n", ""), parsed.separator))
 
 
 if __name__ == "__main__":
