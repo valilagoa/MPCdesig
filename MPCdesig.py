@@ -96,11 +96,11 @@ vmalilagoa@gmail.com
  
 """
 
-
 try:
     import sys
-    vers=".".join(map(str, sys.version_info[:3]))
-    
+
+    vers = ".".join(map(str, sys.version_info[:3]))
+
     import numpy as np
     import re
     import argparse
@@ -111,11 +111,10 @@ except:
     )
     sys.exit(-1)
 
-    
 ####################################################
 # Argument parser, helpful for parsing input arguments when running as a script
 #
-argParserMPC=argparse.ArgumentParser(
+argParserMPC = argparse.ArgumentParser(
     description="""
   Functions for packing and unpacking asteroid designations with different
 formats using regular expressions in Python 3. "Packing" refers to the Minor
@@ -129,14 +128,13 @@ called from the command line.
   i.e. 2008EV5 is also a valid input string.
 
 * Requirements (Python 3): numpy, re, sys and argparse modules
-    """, 
+    """,
     epilog='May 2020. Victor Ali Lagoa (vmalilagoa@gmail.com)'
 )
 
-
 argParserMPC.add_argument(
-    '-d', dest='desig', type=str, 
-    help='An input asteroid designation')    
+    '-d', dest='desig', type=str,
+    help='An input asteroid designation')
 
 argParserMPC.add_argument(
     '-f', dest='filename', type=str,
@@ -153,66 +151,63 @@ Separator character for provis. designations.\n
 Default '_' (e.g. 2008_EV5)""")
 
 argParserMPC.add_argument(
-    '-u', dest='unpack', action="store_true", 
+    '-u', dest='unpack', action="store_true",
     help='Unpack the input')
-
-
 
 ################################################################################
 # Dictionaries to convert to and from packed provisional designations
 #
 
-p2unp_prov = dict([('I','18'), ('J','19'), ('K','20')])
-unp2p_prov = dict([('18','I'), ('19','J'), ('20','K')])
+p2unp_prov = dict([('I', '18'), ('J', '19'), ('K', '20')])
+unp2p_prov = dict([('18', 'I'), ('19', 'J'), ('20', 'K')])
 
-# packed numbered to unpacked numbered and viceversa
-p2unp_num = dict([('A', '10'),('B', '11'),('C', '12'),('D', '13'), 
-                  ('E', '14'),('F', '15'),('G', '16'),('H', '17'), 
-                  ('I', '18'),('J', '19'),('K', '20'),('L', '21'), 
-                  ('M', '22'),('N', '23'),('O', '24'),('P', '25'), 
-                  ('Q', '26'),('R', '27'),('S', '28'),('T', '29'), 
-                  ('U', '30'),('V', '31'),('W', '32'),('X', '33'), 
-                  ('Y', '34'),('Z', '35'),('a', '36'),('b', '37'), 
-                  ('c', '38'),('d', '39'),('e', '40'),('f', '41'), 
-                  ('g', '42'),('h', '43'),('i', '44'),('j', '45'), 
-                  ('k', '46'),('l', '47'),('m', '48'),('n', '49'), 
-                  ('o', '50'),('p', '51'),('q', '52'),('r', '53'), 
-                  ('s', '54'),('t', '55'),('u', '56'),('v', '57'), 
-                  ('w', '58'),('x', '59'),('y', '60'),('z', '61')])
+# packed numbered to unpacked numbered and vice versa
+p2unp_num = dict([('A', '10'), ('B', '11'), ('C', '12'), ('D', '13'),
+                  ('E', '14'), ('F', '15'), ('G', '16'), ('H', '17'),
+                  ('I', '18'), ('J', '19'), ('K', '20'), ('L', '21'),
+                  ('M', '22'), ('N', '23'), ('O', '24'), ('P', '25'),
+                  ('Q', '26'), ('R', '27'), ('S', '28'), ('T', '29'),
+                  ('U', '30'), ('V', '31'), ('W', '32'), ('X', '33'),
+                  ('Y', '34'), ('Z', '35'), ('a', '36'), ('b', '37'),
+                  ('c', '38'), ('d', '39'), ('e', '40'), ('f', '41'),
+                  ('g', '42'), ('h', '43'), ('i', '44'), ('j', '45'),
+                  ('k', '46'), ('l', '47'), ('m', '48'), ('n', '49'),
+                  ('o', '50'), ('p', '51'), ('q', '52'), ('r', '53'),
+                  ('s', '54'), ('t', '55'), ('u', '56'), ('v', '57'),
+                  ('w', '58'), ('x', '59'), ('y', '60'), ('z', '61')])
 
 unp2p_num = dict([('00', '0'),
-                  ('10', 'A'),('11', 'B'),('12', 'C'),('13', 'D'),
-                  ('14', 'E'),('15', 'F'),('16', 'G'),('17', 'H'),
-                  ('18', 'I'),('19', 'J'),('20', 'K'),('21', 'L'),
-                  ('22', 'M'),('23', 'N'),('24', 'O'),('25', 'P'),
-                  ('26', 'Q'),('27', 'R'),('28', 'S'),('29', 'T'),
-                  ('30', 'U'),('31', 'V'),('32', 'W'),('33', 'X'),
-                  ('34', 'Y'),('35', 'Z'),('36', 'a'),('37', 'b'),
-                  ('38', 'c'),('39', 'd'),('40', 'e'),('41', 'f'),
-                  ('42', 'g'),('43', 'h'),('44', 'i'),('45', 'j'),
-                  ('46', 'k'),('47', 'l'),('48', 'm'),('49', 'n'),
-                  ('50', 'o'),('51', 'p'),('52', 'q'),('53', 'r'),
-                  ('54', 's'),('55', 't'),('56', 'u'),('57', 'v'),
-                  ('58', 'w'),('59', 'x'),('60', 'y'),('61', 'z')])
-
+                  ('10', 'A'), ('11', 'B'), ('12', 'C'), ('13', 'D'),
+                  ('14', 'E'), ('15', 'F'), ('16', 'G'), ('17', 'H'),
+                  ('18', 'I'), ('19', 'J'), ('20', 'K'), ('21', 'L'),
+                  ('22', 'M'), ('23', 'N'), ('24', 'O'), ('25', 'P'),
+                  ('26', 'Q'), ('27', 'R'), ('28', 'S'), ('29', 'T'),
+                  ('30', 'U'), ('31', 'V'), ('32', 'W'), ('33', 'X'),
+                  ('34', 'Y'), ('35', 'Z'), ('36', 'a'), ('37', 'b'),
+                  ('38', 'c'), ('39', 'd'), ('40', 'e'), ('41', 'f'),
+                  ('42', 'g'), ('43', 'h'), ('44', 'i'), ('45', 'j'),
+                  ('46', 'k'), ('47', 'l'), ('48', 'm'), ('49', 'n'),
+                  ('50', 'o'), ('51', 'p'), ('52', 'q'), ('53', 'r'),
+                  ('54', 's'), ('55', 't'), ('56', 'u'), ('57', 'v'),
+                  ('58', 'w'), ('59', 'x'), ('60', 'y'), ('61', 'z')])
 
 ################################################################################
 # Compiled regular expressions
 #
 
-reNum=re.compile(r"^[\(]?(\d{1,8})\)?\b")     
-                                      
-rePackedNum=re.compile(r"\b([~a-zA-Z])(\d{4})\b")
-                                                #matches e.g. A3434, g3434
-                                                # but not A343 or g34343
+reNum = re.compile(r"^[\(]?(\d{1,8})\)?\b")
+
+rePackedNum = re.compile(r"\b([~a-zA-Z])(\d{4})\b")
+# matches e.g. A3434, g3434
+# but not A343 or g34343
 
 # Capture the first group of numbers before the last four:
-reProv      =re.compile("\\b(\\d{4})([- _]?)([a-zA-Z]{2})(\\d*)\\b")
-rePackedProv=re.compile("\\b([IJK])(\\d{2})([A-Z])([a-zA-Z0-9])(\\d)([A-Z])\\b")
-reSurv      =re.compile("\\b(\\d{4})[- _]([PT]{1})-([L123]{1})\\b")
-rePackedSurv=re.compile("\\b([PT]{1})([L123]{1})S(\\d{4})\\b")
-re6digits   =re.compile("\\b(\\d{2,})(\\d{4})\\b")
-rePackedLong=re.compile(r"(\~)([0-9a-zA-Z]{4})\b")
+reProv = re.compile("\\b(\\d{4})([- _]?)([a-zA-Z]{2})(\\d*)\\b")
+rePackedProv = re.compile("\\b([IJK])(\\d{2})([A-Z])([a-zA-Z0-9])(\\d)([A-Z])\\b")
+reSurv = re.compile("\\b(\\d{4})[- _]([PT]{1})-([L123]{1})\\b")
+rePackedSurv = re.compile("\\b([PT]{1})([L123]{1})S(\\d{4})\\b")
+re6digits = re.compile("\\b(\\d{2,})(\\d{4})\\b")
+rePackedLong = re.compile(r"(\~)([0-9a-zA-Z]{4})\b")
 
 
 ###############################################################################
@@ -229,6 +224,7 @@ def to_str(input_desig):
     """
     return str(input_desig).strip()
 
+
 def check_valid_surv_desig(input_desig):
     """
     Check whether the input designation is a valid survey designation (packed 
@@ -242,7 +238,7 @@ def check_valid_surv_desig(input_desig):
     """
 
     try:
-        input_str=to_str(input_desig)
+        input_str = to_str(input_desig)
         return check_packed_unpacked(input_str, reSurv, rePackedSurv)
     except:
         return False
@@ -271,9 +267,9 @@ def check_valid_num_desig(input_des):
 
     *Return: boolean
     """
-    
+
     try:
-        input_desig=str(input_des)
+        input_desig = str(input_des)
     except:
         # something is wrong... Is it an array or a list?
         return False
@@ -310,12 +306,12 @@ def check_valid_prov_desig(input_desig):
     """
 
     try:
-        input_str=to_str(input_desig)
+        input_str = to_str(input_desig)
         return check_packed_unpacked(input_str, reProv, rePackedProv)
     except:
         return False
 
-    
+
 def check_valid_desig(input_des):
     """
     This function checks whether the input is a valid asteroid designation. It 
@@ -327,9 +323,9 @@ def check_valid_desig(input_des):
     *Return: boolean
     """
 
-    input_desig=str(input_des)
-    
-    if check_valid_prov_desig(input_desig): 
+    input_desig = str(input_des)
+
+    if check_valid_prov_desig(input_desig):
         return True
     elif check_valid_surv_desig(input_desig):
         return True
@@ -338,7 +334,7 @@ def check_valid_desig(input_des):
     else:
         return False
 
-    
+
 def does_it_match_re(input_desig, comp_re):
     """
     Check whether the input asteroid designation is matched by the input 
@@ -349,17 +345,17 @@ def does_it_match_re(input_desig, comp_re):
 
     *Return: boolean
     """
-    
-    does_it=False # by default
-    
-    input_str=to_str(input_desig)
-    fa_match=comp_re.findall(input_str)
-    
-    if fa_match and len(fa_match)==1:
+
+    does_it = False  # by default
+
+    input_str = to_str(input_desig)
+    fa_match = comp_re.findall(input_str)
+
+    if fa_match and len(fa_match) == 1:
         # We consider more than one match suspicious (the input
         # must contain only one valid asteroid designation). 
-        does_it=True
-    
+        does_it = True
+
     return does_it
 
 
@@ -378,9 +374,9 @@ def check_packed_unpacked(input_desig, compPacked, compUnpacked):
 
     *Return: boolean
     """
-    
-    input_str=to_str(input_desig)
-    #fa_match=compPacked.findall(input_str)
+
+    input_str = to_str(input_desig)
+    # fa_match=compPacked.findall(input_str)
 
     if does_it_match_re(input_str, compPacked):
         return True
@@ -401,29 +397,28 @@ def check_single_unp_prov(input_desig):
 
     *Return: boolean
     """
-    final_c=False
-    
-    input_d=to_str(input_desig)
+    final_c = False
+
+    input_d = to_str(input_desig)
     if check_valid_prov_desig(input_d) and check_valid_num_desig(input_d):
-            
-        fa_match=reProv.findall(input_d)
+
+        fa_match = reProv.findall(input_d)
         if fa_match:
-            first_part=fa_match[0][0]
+            first_part = fa_match[0][0]
         else:
             return final_c
-        fa_match=reNum.findall(input_d)
+        fa_match = reNum.findall(input_d)
         if fa_match:
-            num=fa_match[0]
+            num = fa_match[0]
         else:
             return final_c
 
         if num == first_part:
-            final_c=True
+            final_c = True
 
     return final_c
-    
 
-            
+
 def pack_base_62(num_desig):
     """
     Pack a numbered designation greater than 619999 following the Minor 
@@ -432,23 +427,23 @@ def pack_base_62(num_desig):
     *Input: a valid numbered designation (string or integer)
     *Return: a string with the corresponding packed designation or an error 
     message
-    """  
-    
+    """
+
     try:
-        num_int=int(num_desig)-620000
-        resul=""
+        num_int = int(num_desig) - 620000
+        resul = ""
     except ValueError:
         return "pack_base_62(): Error. {0} not a valid num. designation".format(
             num_desig)
-        
+
     for i in range(4):
-        q=num_int//62
-        rem=num_int % 62
-        if rem>9:
-            rem="{0}".format(unp2p_num[str(rem)])
-        num_int=q        
-        resul=str(rem)+resul
-    return "~"+"{0}".format(resul)
+        q = num_int // 62
+        rem = num_int % 62
+        if rem > 9:
+            rem = "{0}".format(unp2p_num[str(rem)])
+        num_int = q
+        resul = str(rem) + resul
+    return "~" + "{0}".format(resul)
 
 
 def unpack_base_62(packed_desig):
@@ -461,24 +456,24 @@ def unpack_base_62(packed_desig):
     *Return: string with the corresponding unpacked designation or an error 
     message
     """
-    errmssg="Error. {0} is not a valid packed long numbered designation".format(
+    errmssg = "Error. {0} is not a valid packed long numbered designation".format(
         packed_desig)
-    
-    if not(does_it_match_re(packed_desig, rePackedLong)):
+
+    if not (does_it_match_re(packed_desig, rePackedLong)):
         return "unpack_base_62(): {0}".format(errmssg)
-    
-    suma=0
-    packed_desig=str(packed_desig).strip()
+
+    suma = 0
+    packed_desig = str(packed_desig).strip()
     for i in range(4):
-        pos_i=packed_desig[1+i]
+        pos_i = packed_desig[1 + i]
         if pos_i.isdigit():
-            num=int(pos_i)
+            num = int(pos_i)
         else:
-            num=int(p2unp_num[packed_desig[1+i]])
-        suma+=num*np.power(62,3-i)
-    return str(suma+620000)
-    
-        
+            num = int(p2unp_num[packed_desig[1 + i]])
+        suma += num * np.power(62, 3 - i)
+    return str(suma + 620000)
+
+
 def pack_num(input_desig):
     """
     Pack an input numbered asteroid designation, e.g. (1) Ceres, or 1 Ceres. If
@@ -488,71 +483,71 @@ def pack_num(input_desig):
 
     *Return: string with the MPC-packed designation or an error message
     """
-      
-    errmssg="""pack_num() error: '{0}' not valid for packing""".format(
+
+    errmssg = """pack_num() error: '{0}' not valid for packing""".format(
         input_desig)
 
-    input_str=to_str(input_desig)
+    input_str = to_str(input_desig)
     if check_valid_num_desig(input_str):
-        
+
         try:
             # We remove parentheses
-            num=int(re.sub("[\(\)]", "", input_str.split(" ")[0]))
+            num = int(re.sub("[\(\)]", "", input_str.split(" ")[0]))
             if num > 619999:
                 # We pack it with the base 62 notation
                 return pack_base_62(num)
-                
-            elif num>99999:
+
+            elif num > 99999:
                 # we regex for the two groups to pack the first two digits:
-                fa_long=re6digits.findall(input_str)
-                pref=unp2p_num[fa_long[0][0]]
-                return pref+fa_long[0][1]
+                fa_long = re6digits.findall(input_str)
+                pref = unp2p_num[fa_long[0][0]]
+                return pref + fa_long[0][1]
             else:
                 # it requires padding
                 return "{0:05d}".format(num)
-            
+
         except:
             # the int() failed so it should be a valid packed desig
             return input_desig
     else:
-        #print(errmssg)
+        # print(errmssg)
         return errmssg
 
-    
+
 def unpack_num(input_desig):
-   """
-   Return the unpacked version of the input number designation if it is 
-   a valid packed one, or the very input if it is a valid unpacked one. 
-   It returns an error message otherwise. 
+    """
+    Return the unpacked version of the input number designation if it is
+    a valid packed one, or the very input if it is a valid unpacked one.
+    It returns an error message otherwise.
 
-   *Input: asteroid designation (string or int)
+    *Input: asteroid designation (string or int)
 
-   *Return: unpacked designation or error message
-   """
-   
-   errmssg="""unpack_num(): Error. '{0}' not valid for unpacking""".format(
-       input_desig)
+    *Return: unpacked designation or error message
+    """
 
-   input_str=to_str(input_desig)
-   if check_valid_num_desig(input_str):
-       fa_match=rePackedLong.findall(input_str)
-       if fa_match and len(fa_match)==1:
-           return unpack_base_62(input_str)
-       else:
-           fa_match=rePackedNum.findall(input_desig)
-           if fa_match and len(fa_match)==1:
-               frst=p2unp_num[fa_match[0][0]]
-               return frst+fa_match[0][1]
-           else:
-               fa_match=reNum.findall(input_desig)
-               return "{0:d}".format(int(fa_match[0]))
-               #print("reNum ", fa_match[0])
+    errmssg = """unpack_num(): Error. '{0}' not valid for unpacking""".format(
+        input_desig)
 
-   else:
-       #print(errmssg)
-       return errmssg
-   
-        
+    input_str = to_str(input_desig)
+    if check_valid_num_desig(input_str):
+        fa_match = rePackedLong.findall(input_str)
+        if fa_match and len(fa_match) == 1:
+            return unpack_base_62(input_str)
+        else:
+            fa_match = rePackedNum.findall(input_desig)
+            if fa_match and len(fa_match) == 1:
+                frst = p2unp_num[fa_match[0][0]]
+                return frst + fa_match[0][1]
+            else:
+                fa_match = reNum.findall(input_desig)
+                return "{0:d}".format(int(fa_match[0]))
+                # print("reNum ", fa_match[0])
+
+    else:
+        # print(errmssg)
+        return errmssg
+
+
 def pack_prov(input_desig):
     """Pack an input designation if it is a valid provisional asteroid 
     designation. For example, 
@@ -572,49 +567,48 @@ def pack_prov(input_desig):
     *Return: a string with the packed form of the input or an error message
     """
 
-    errmssg="""pack_prov(): Error. '{0}' not valid for packing""".format(
+    errmssg = """pack_prov(): Error. '{0}' not valid for packing""".format(
         input_desig)
 
-    input_str=to_str(input_desig)
+    input_str = to_str(input_desig)
     if check_valid_prov_desig(input_str):
-        
-        fa_match=reProv.findall(input_str)
-        if fa_match and len(fa_match)==1:
-            #It must have worked:
+
+        fa_match = reProv.findall(input_str)
+        if fa_match and len(fa_match) == 1:
+            # It must have worked:
             # so fa_match must be of the form:
             # [('1923', '-', 'AG', '342')]
             #
-            #year 1923 -> frst=19, scnd=23 
-            frst=unp2p_prov[fa_match[0][0][0:2]]
-            scnd=fa_match[0][0][2:]
+            # year 1923 -> frst=19, scnd=23
+            frst = unp2p_prov[fa_match[0][0][0:2]]
+            scnd = fa_match[0][0][2:]
 
-            #half-month period, e.g. ABnumb -> ApackedB
-            frst_hm=fa_match[0][2][0]
-            scnd_hm=fa_match[0][2][1]
+            # half-month period, e.g. ABnumb -> ApackedB
+            frst_hm = fa_match[0][2][0]
+            scnd_hm = fa_match[0][2][1]
 
-            num_str=fa_match[0][3]
-            if len(num_str)==0:
-                mid="00"
-            elif len(num_str)>2:
-                #We pack the two first numbers
-                mid=unp2p_num[num_str[0:2]]+num_str[2]
+            num_str = fa_match[0][3]
+            if len(num_str) == 0:
+                mid = "00"
+            elif len(num_str) > 2:
+                # We pack the two first numbers
+                mid = unp2p_num[num_str[0:2]] + num_str[2]
             else:
-                mid="{0:02d}".format(int(num_str))
-            
-            return frst+scnd+frst_hm+mid+scnd_hm
-            
+                mid = "{0:02d}".format(int(num_str))
+
+            return frst + scnd + frst_hm + mid + scnd_hm
+
         else:
-            #It might be already packed:
-            fa_match=rePackedProv.findall(input_str)
-            if fa_match and len(fa_match)==1:
+            # It might be already packed:
+            fa_match = rePackedProv.findall(input_str)
+            if fa_match and len(fa_match) == 1:
                 return input_str
             else:
-                #print(errmssg)
+                # print(errmssg)
                 return errmssg
     else:
-        #print(errmssg)
+        # print(errmssg)
         return errmssg
-
 
 
 def unpack_prov(input_desig, separator):
@@ -628,41 +622,42 @@ def unpack_prov(input_desig, separator):
     *Return: unpacked provisional designation (str) or an error message
     """
 
-    errmssg="""unpack_prov(): Error. '{0}' not valid for unpacking""".format(
+    errmssg = """unpack_prov(): Error. '{0}' not valid for unpacking""".format(
         input_desig)
 
-    input_str=re.sub("[ _]", "-", to_str(input_desig), count=1)
+    input_str = re.sub("[ _]", "-", to_str(input_desig), count=1)
     if check_valid_prov_desig(input_str):
-        fa_match=reProv.findall(input_str)
-        if fa_match and len(fa_match)==1:
-            #it is a valid provisional designation, already unpacked, so
-            #we just insert the input separator
-            return fa_match[0][0]+separator+fa_match[0][2]+fa_match[0][3]
-        
-        fa_match=rePackedProv.findall(input_desig)
-        frst_y=p2unp_prov[fa_match[0][0]]
-        scnd_y =fa_match[0][1]
-        frst_fn=fa_match[0][2]
-        scnd_fn=fa_match[0][5]
-        try:
-            n1=int(fa_match[0][3])
-            if n1 < 1:
-                n1=""
-            else:
-                n1=str(n1)
-        except:
-            n1=p2unp_num[fa_match[0][3][0]]
+        fa_match = reProv.findall(input_str)
+        if fa_match and len(fa_match) == 1:
+            # it is a valid provisional designation, already unpacked, so
+            # we just insert the input separator
+            return fa_match[0][0] + separator + fa_match[0][2] + fa_match[0][3]
 
-        n2=fa_match[0][4]
-        if int(fa_match[0][4])<1:
-            n2=""
-        
-        return frst_y+scnd_y+separator+frst_fn+scnd_fn+n1+n2
+        fa_match = rePackedProv.findall(input_desig)
+        frst_y = p2unp_prov[fa_match[0][0]]
+        scnd_y = fa_match[0][1]
+        frst_fn = fa_match[0][2]
+        scnd_fn = fa_match[0][5]
+        try:
+            n1 = int(fa_match[0][3])
+            if n1 < 1:
+                n1 = ""
+            else:
+                n1 = str(n1)
+        except:
+            n1 = p2unp_num[fa_match[0][3][0]]
+
+        n2 = fa_match[0][4]
+        if int(fa_match[0][4]) < 1:
+            n2 = ""
+
+        return frst_y + scnd_y + separator + frst_fn + scnd_fn + n1 + n2
     else:
-        #print(errmssg)
+        # print(errmssg)
         return errmssg
 
-def pack_survey(input_desig):
+
+def pack_survey_desig(input_desig):
     """
     Pack a special survey asteroid designation.
 
@@ -671,23 +666,23 @@ def pack_survey(input_desig):
     *Return: a string with the packed designation or an error message
     """
 
-    errmssg="{0} is not a valid special survey designation".format(input_desig)
+    errmssg = "{0} is not a valid special survey designation".format(input_desig)
 
-    des=to_str(input_desig)
-    
+    des = to_str(input_desig)
+
     if des.isdigit():
-        return "pack_survey(): Error. {0}".format(errmssg)
+        return "pack_survey_desig(): Error. {0}".format(errmssg)
 
     try:
-        numbers=des[0:4]
-        lett1=des[5]
-        lett2=des[7]
-        return lett1+lett2+"S"+numbers
+        numbers = des[0:4]
+        lett1 = des[5]
+        lett2 = des[7]
+        return lett1 + lett2 + "S" + numbers
     except:
-        return "pack_survey(): Error. {0}".format(errmssg)
+        return "pack_survey_desig(): Error. {0}".format(errmssg)
 
-    
-def unpack_survey(input_desig):
+
+def unpack_survey_desig(input_desig):
     """
     Unpack a special survey asteroid designation.
 
@@ -696,23 +691,23 @@ def unpack_survey(input_desig):
     *Return: a string with the packed designation or an error message
     """
 
-    errmssg="{0} is not a valid special survey designation".format(input_desig)
+    errmssg = "{0} is not a valid special survey designation".format(input_desig)
 
-    des=to_str(input_desig)
+    des = to_str(input_desig)
 
     if des.isdigit():
         # This should not happen, by definition
-        return "unpack_survey(): Error. {0}".format(errmssg)
-    
+        return "unpack_survey_desig(): Error. {0}".format(errmssg)
+
     try:
-        numbers=des[3:]
-        lett1=des[0]
-        lett2=des[1]
-        return numbers+" "+lett1+"-"+lett2
+        numbers = des[3:]
+        lett1 = des[0]
+        lett2 = des[1]
+        return numbers + " " + lett1 + "-" + lett2
     except:
-        return "unpack_survey(): Error. {0}".format(errmssg)    
-    
-    
+        return "unpack_survey_desig(): Error. {0}".format(errmssg)
+
+
 def unpack(input_desig, separator):
     """
     Call the necessary function for unpacking the input after some checks. 
@@ -724,26 +719,26 @@ def unpack(input_desig, separator):
 
     *Return: an unpacked asteroid designation (string) or an error message
     """
-    
-    errmssg="""unpack(): Error. '{0}' not valid for unpacking""".format(
+
+    errmssg = """unpack(): Error. '{0}' not valid for unpacking""".format(
         input_desig)
 
-    input_d=to_str(input_desig)
+    input_d = to_str(input_desig)
 
-    single_provis=check_single_unp_prov(input_d)
-    
+    single_provis = check_single_unp_prov(input_d)
+
     if check_valid_surv_desig(input_d):
-        return unpack_surv_desig(input_d)
-    elif check_valid_num_desig(input_d) and not(single_provis):
+        return unpack_survey_desig(input_d)
+    elif check_valid_num_desig(input_d) and not single_provis:
         return unpack_num(input_d)
     elif check_valid_prov_desig(input_d):
         return unpack_prov(input_d, str(separator))
 
     else:
-        #print(errmssg)
+        # print(errmssg)
         return errmssg
 
-    
+
 def pack(input_desig):
     """
     Call the necessary function for packing the input designation after some 
@@ -754,23 +749,23 @@ def pack(input_desig):
 
     *Return: an unpacked asteroid designation (string) or error message
     """
-    
-    errmssg="""pack(): Error. '{0}' not valid for packing""".format(input_desig)
 
-    input_d=to_str(input_desig)
-    
-    single_provis=check_single_unp_prov(input_d)
+    errmssg = """pack(): Error. '{0}' not valid for packing""".format(input_desig)
+
+    input_d = to_str(input_desig)
+
+    single_provis = check_single_unp_prov(input_d)
 
     if check_valid_surv_desig(input_d):
-        return pack_surv_desig(input_d)
-    elif check_valid_num_desig(input_d) and not(single_provis):
+        return pack_survey_desig(input_d)
+    elif check_valid_num_desig(input_d) and not (single_provis):
         return pack_num(input_d)
     elif check_valid_prov_desig(input_d):
         return pack_prov(input_d)
     else:
-         return errmssg
+        return errmssg
 
-    
+
 def convert(inp, p_or_unp):
     """
     Pack or unpack the input designation or file with designations. This is 
@@ -787,52 +782,51 @@ def convert(inp, p_or_unp):
      
     *Return: string with output or an error message
     """
-    
-    input_= str(inp)
-    if len(input_)>0 and check_valid_desig(input_):
-        desigs=[input_]
+
+    input_ = str(inp)
+    if len(input_) > 0 and check_valid_desig(input_):
+        desigs = [input_]
         # Create a list with the input so that we can iterate over it
     else:
         try:
             # Perhaps it is an input filename, not a designation
-            myfile=open(input_, 'r')
-            desigs=myfile.readlines()
+            myfile = open(input_, 'r')
+            desigs = myfile.readlines()
             myfile.close()
         except IOError:
             print("convert(): Error. Did not find file '{0}'".format(input_))
-            desigs=[]
+            desigs = []
             # We still need an empty list to iterate over next
 
     for ides in desigs:
-        if len(ides.split())<1:
-            print ("convert(): Warning. Input is an empty line")
+        if len(ides.split()) < 1:
+            print("convert(): Warning. Input is an empty line")
         else:
             if p_or_unp == "pack":
-                print(pack(ides.replace("\n","")))
+                print(pack(ides.replace("\n", "")))
             elif p_or_unp == "unpack":
-                print(unpack(ides.replace("\n",""), "_"))
+                print(unpack(ides.replace("\n", ""), "_"))
             else:
                 print("convert(): Error. 2nd arg. must be 'pack' or 'unpack'")
 
 
 def main():
+    parsed = argParserMPC.parse_args()
 
-    parsed=argParserMPC.parse_args()
-
-    if not(parsed.pack or parsed.unpack):
-        print ("main(): Error. Either -p or -u must be used")
+    if not (parsed.pack or parsed.unpack):
+        print("main(): Error. Either -p or -u must be used")
         sys.exit(-1)
-    
+
     if parsed.desig:
         # if we parsed a designation, we have a list with one element
-        desigs=[parsed.desig]
+        desigs = [parsed.desig]
 
     elif parsed.filename:
+        filename = str(parsed.filename)
         # we expect a file with many desigs
         try:
-            filename=str(parsed.filename)
-            openfile=open(filename, 'r')
-            desigs=openfile.readlines()
+            openfile = open(filename, 'r')
+            desigs = openfile.readlines()
             openfile.close()
         except IOError:
             print("main(): Error. Did not find file '{0}'\n".format(filename))
@@ -845,41 +839,15 @@ def main():
     # If we made it here, we have at least one designation to try to convert
     #
     for ides in desigs:
-        if len(ides.split())<1:
-            print ("main(): Warning. Empty line")
+        if len(ides.split()) < 1:
+            print("main(): Warning. Empty line")
         else:
             if parsed.pack:
-                print (pack(ides.replace("\n", "")))
+                print(pack(ides.replace("\n", "")))
             elif parsed.unpack:
-                print (unpack(ides.replace("\n", ""), parsed.separator))
+                print(unpack(ides.replace("\n", ""), parsed.separator))
 
-    
+
 if __name__ == "__main__":
     # execute only if run as a script
     main()
-
-
-def is_it_valid_packed_survey(input_desig):
-    """Obsolete."""
-    
-    input_str=to_str(input_desig)
-    fa_match=rePackedSurv.findall(input_str)
-    if fa_match and len(fa_match)==1:
-        return True
-    else:
-        return False
-                    
-def is_it_valid_unpacked_survey(input_desig):
-    """Obsolete."""
-    
-    if (len(input_desig)!=8):
-        return False
-    else:
-        cond1=input_desig[0:4].isdigit()
-        cond2=input_desig[4] in sep
-        cond3=input_desig[6]=="-"
-
-        if(cond1 and cond2 and cond3):
-            return True
-        else:
-            return False
