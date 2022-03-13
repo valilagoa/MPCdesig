@@ -192,20 +192,20 @@ unp2p_num = dict([('00', '0'),
 # Compiled regular expressions
 #
 
-reNum = re.compile(r"^[\(]?(\d{1,8})\)?\b")
+re_numbered_designation = re.compile(r"^[(]?(\d{1,8})[)]?\b")
 
-rePackedNum = re.compile(r"\b([~a-zA-Z])(\d{4})\b")
+re_packed_numbered_designation = re.compile(r"\b([~a-zA-Z])(\d{4})\b")
 # matches e.g. A3434, g3434
 # but not A343 or g34343
 
 # Capture the first group of numbers before the last four:
 re_provisional_designation = \
-    re.compile("\\b(\\d{4})([- _]?)([a-zA-Z]{2})(\\d*)\\b")
+    re.compile(r"\b(\d{4})([- _]?)([a-zA-Z]{2})(\d*)\b")
 re_packed_provisional_designation = \
-    re.compile("\\b([IJK])(\\d{2})([A-Z])([a-zA-Z0-9])(\\d)([A-Z])\\b")
+    re.compile(r"\b([IJK])(\d{2})([A-Z])([a-zA-Z0-9])(\d)([A-Z])\b")
 re_survey = re.compile(r"\b(\d{4})[- _]([PT])-([L123])\b")
 re_packed_survey = re.compile(r"\b([PT])([L123])S(\d{4})\b")
-re6digits = re.compile("\\b(\\d{2,})(\\d{4})\\b")
+re6digits = re.compile(r"\b(\d{2,})(\d{4})\b")
 rePackedLong = re.compile(r"(\~)([0-9a-zA-Z]{4})\b")
 
 
@@ -266,7 +266,7 @@ def check_valid_num_desig(designation: str) -> bool:
     a1203, 361203, ~232s are all valid numbered designations. Unlike 
     check_valid_prov_desig() or check_valid_surv_desig(), this does not simply 
     call check_packed_unpacked() because that approach would not work well
-    with numbered designations (the reNum will match anything that contains at 
+    with numbered designations (the re_numbered_designation will match anything that contains at 
     least one digit).
 
     Names or anything written after a matched designation are ignored except
@@ -291,16 +291,16 @@ def check_valid_num_desig(designation: str) -> bool:
 
     # can we transform it into a single string with digits?
     if designation.isdigit():
-        if designation_matches_compiled_re(designation, reNum):
+        if designation_matches_compiled_re(designation, re_numbered_designation):
             return True
         else:
             # It should not be longer than 8 digit characters long (in 2020!)
             return False
     elif designation_matches_compiled_re(designation, rePackedLong):
         return True
-    elif designation_matches_compiled_re(designation, rePackedNum):
+    elif designation_matches_compiled_re(designation, re_packed_numbered_designation):
         return True
-    elif designation_matches_compiled_re(designation, reNum):
+    elif designation_matches_compiled_re(designation, re_numbered_designation):
         # => must still be of the type "(1) Ceres"
         return True
     else:
@@ -383,14 +383,14 @@ def is_packed_or_unpacked(designation: str,
     """
     Check if an input designation is a valid one according to the input 
     compiled regular expressions (they should match the type of designation you
-    are trying to verify, e.g. reNum and reNumPacked for numbered designations).
+    are trying to verify, e.g. re_numbered_designation and re_packed_numbered_designation for numbered designations).
     See also check_valid_num_desig() or check_valid_prov_desig(). 
 
     *Input: input_desig is a string or an integer
     *Input: compPacked is a compiled regular expression conceived to find a 
-    certain type of packed designation, e.g. reNum or reProv
+    certain type of packed designation, e.g. re_numbered_designation or reProv
     *Input: compUnpacked is a compiled regular expression conceived to find a 
-    certain type of unpacked designation, e.g. reNumPacked or reProvPacked
+    certain type of unpacked designation, e.g. re_packed_numbered_designation or reProvPacked
 
     *Return: boolean
     """
@@ -420,7 +420,7 @@ def check_single_unp_prov(input_desig):
             first_part = fa_match[0][0]
         else:
             return final_c
-        fa_match = reNum.findall(input_d)
+        fa_match = re_numbered_designation.findall(input_d)
         if fa_match:
             num = fa_match[0]
         else:
@@ -547,14 +547,13 @@ def unpack_num(input_desig):
         if fa_match and len(fa_match) == 1:
             return unpack_base_62(input_str)
         else:
-            fa_match = rePackedNum.findall(input_desig)
+            fa_match = re_packed_numbered_designation.findall(input_desig)
             if fa_match and len(fa_match) == 1:
                 frst = p2unp_num[fa_match[0][0]]
                 return frst + fa_match[0][1]
             else:
-                fa_match = reNum.findall(input_desig)
+                fa_match = re_numbered_designation.findall(input_desig)
                 return "{0:d}".format(int(fa_match[0]))
-                # print("reNum ", fa_match[0])
 
     else:
         # print(errmssg)
@@ -617,7 +616,6 @@ def pack_prov(input_desig):
             if fa_match and len(fa_match) == 1:
                 return input_str
             else:
-                # print(errmssg)
                 return errmssg
     else:
         # print(errmssg)
