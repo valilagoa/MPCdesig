@@ -104,11 +104,8 @@ try:
     import re
     import argparse
 
-except:
-    print("\n*****\npython {0}: {1}\n*****\n".format(
-        version_string, sys.exc_info()[1])
-    )
-    sys.exit(-1)
+except ModuleNotFoundError:
+    sys.exit(f"\n*****\npython {version_string}: {sys.exc_info()[1]}\n*****\n")
 
 ####################################################
 # Argument parser, helpful for parsing input arguments when running as a script
