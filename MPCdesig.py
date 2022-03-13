@@ -96,11 +96,10 @@ vmalilagoa@gmail.com
  
 """
 
+import sys
+vers = ".".join(map(str, sys.version_info[:3]))
+
 try:
-    import sys
-
-    vers = ".".join(map(str, sys.version_info[:3]))
-
     import numpy as np
     import re
     import argparse
