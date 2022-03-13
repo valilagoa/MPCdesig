@@ -200,8 +200,8 @@ rePackedNum = re.compile(r"\b([~a-zA-Z])(\d{4})\b")
 # Capture the first group of numbers before the last four:
 reProv = re.compile("\\b(\\d{4})([- _]?)([a-zA-Z]{2})(\\d*)\\b")
 rePackedProv = re.compile("\\b([IJK])(\\d{2})([A-Z])([a-zA-Z0-9])(\\d)([A-Z])\\b")
-reSurv = re.compile("\\b(\\d{4})[- _]([PT]{1})-([L123]{1})\\b")
-rePackedSurv = re.compile("\\b([PT]{1})([L123]{1})S(\\d{4})\\b")
+re_survey = re.compile(r"\b(\d{4})[- _]([PT])-([L123])\b")
+re_packed_survey = re.compile(r"\b([PT])([L123])S(\d{4})\b")
 re6digits = re.compile("\\b(\\d{2,})(\\d{4})\\b")
 rePackedLong = re.compile(r"(\~)([0-9a-zA-Z]{4})\b")
 
@@ -221,7 +221,7 @@ def to_str(input_desig):
     return str(input_desig).strip()
 
 
-def check_valid_surv_desig(designation: str) -> bool:
+def is_valid_survey_designation(designation: str) -> bool:
     """
     Check whether the input designation is a valid survey designation (packed 
     or unpacked). It simply calls check_packed_unpacked() with the correct 
@@ -235,7 +235,23 @@ def check_valid_surv_desig(designation: str) -> bool:
 
     try:
         designation: str = str(designation).strip()
-        return check_packed_unpacked(designation, reSurv, rePackedSurv)
+        return check_packed_unpacked(designation, re_survey, re_packed_survey)
+    except AttributeError:
+        return False
+
+
+def is_unpacked_survey_designation(designation: str) -> bool:
+    try:
+        designation: str = designation.strip()
+        return designation_matches_compiled_re(designation, re_survey)
+    except AttributeError:
+        return False
+
+
+def is_packed_survey_designation(designation: str) -> bool:
+    try:
+        designation: str = designation.strip()
+        return designation_matches_compiled_re(designation, re_packed_survey)
     except AttributeError:
         return False
 
@@ -272,16 +288,16 @@ def check_valid_num_desig(designation: str) -> bool:
 
     # can we transform it into a single string with digits?
     if designation.isdigit():
-        if does_it_match_re(designation, reNum):
+        if designation_matches_compiled_re(designation, reNum):
             return True
         else:
             # It should not be longer than 8 digit characters long (in 2020!)
             return False
-    elif does_it_match_re(designation, rePackedLong):
+    elif designation_matches_compiled_re(designation, rePackedLong):
         return True
-    elif does_it_match_re(designation, rePackedNum):
+    elif designation_matches_compiled_re(designation, rePackedNum):
         return True
-    elif does_it_match_re(designation, reNum):
+    elif designation_matches_compiled_re(designation, reNum):
         # => must still be of the type "(1) Ceres"
         return True
     else:
@@ -323,7 +339,7 @@ def check_valid_desig(input_des):
 
     if check_valid_prov_desig(input_desig):
         return True
-    elif check_valid_surv_desig(input_desig):
+    elif is_valid_survey_designation(input_desig):
         return True
     elif check_valid_num_desig(input_desig):
         return True
@@ -331,7 +347,7 @@ def check_valid_desig(input_des):
         return False
 
 
-def does_it_match_re(input_desig, comp_re):
+def designation_matches_compiled_re(designation: str, compiled_re: re) -> bool:
     """
     Check whether the input asteroid designation is matched by the input 
     compiled regular expressions.
@@ -342,17 +358,20 @@ def does_it_match_re(input_desig, comp_re):
     *Return: boolean
     """
 
-    does_it = False  # by default
+    it_matches = False  # by default
 
-    input_str = to_str(input_desig)
-    fa_match = comp_re.findall(input_str)
+    try:
+        designation: str = str(designation).strip()
+    except AttributeError:
+        return False
 
-    if fa_match and len(fa_match) == 1:
+    matches = compiled_re.findall(designation)
+    if matches and len(matches) == 1:
         # We consider more than one match suspicious (the input
-        # must contain only one valid asteroid designation). 
-        does_it = True
+        # should contain only one valid asteroid designation).
+        it_matches = True
 
-    return does_it
+    return it_matches
 
 
 def check_packed_unpacked(input_str, compPacked, compUnpacked):
@@ -373,9 +392,9 @@ def check_packed_unpacked(input_str, compPacked, compUnpacked):
 
     # fa_match=compPacked.findall(input_str)
 
-    if does_it_match_re(input_str, compPacked):
+    if designation_matches_compiled_re(input_str, compPacked):
         return True
-    elif does_it_match_re(input_str, compUnpacked):
+    elif designation_matches_compiled_re(input_str, compUnpacked):
         return True
     else:
         return False
@@ -394,7 +413,7 @@ def check_single_unp_prov(input_desig):
     """
     final_c = False
 
-    input_d = to_str(input_desig)
+    input_d = str(input_desig).strip()
     if check_valid_prov_desig(input_d) and check_valid_num_desig(input_d):
 
         fa_match = reProv.findall(input_d)
@@ -454,7 +473,7 @@ def unpack_base_62(packed_desig):
     errmssg = "Error. {0} is not a valid packed long numbered designation".format(
         packed_desig)
 
-    if not (does_it_match_re(packed_desig, rePackedLong)):
+    if not (designation_matches_compiled_re(packed_desig, rePackedLong)):
         return "unpack_base_62(): {0}".format(errmssg)
 
     suma = 0
@@ -722,8 +741,11 @@ def unpack(input_desig, separator):
 
     single_provis = check_single_unp_prov(input_d)
 
-    if check_valid_surv_desig(input_d):
-        return unpack_survey_desig(input_d)
+    if is_valid_survey_designation(input_d):
+        if is_unpacked_survey_designation(input_d):
+            return input_d
+        else:
+            return unpack_survey_desig(input_d)
     elif check_valid_num_desig(input_d) and not single_provis:
         return unpack_num(input_d)
     elif check_valid_prov_desig(input_d):
@@ -751,7 +773,7 @@ def pack(input_desig):
 
     single_provis = check_single_unp_prov(input_d)
 
-    if check_valid_surv_desig(input_d):
+    if is_valid_survey_designation(input_d):
         return pack_survey_desig(input_d)
     elif check_valid_num_desig(input_d) and not (single_provis):
         return pack_num(input_d)
