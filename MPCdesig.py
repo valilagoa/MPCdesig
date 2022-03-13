@@ -221,7 +221,7 @@ def to_str(input_desig):
     return str(input_desig).strip()
 
 
-def check_valid_surv_desig(input_desig):
+def check_valid_surv_desig(designation: str) -> bool:
     """
     Check whether the input designation is a valid survey designation (packed 
     or unpacked). It simply calls check_packed_unpacked() with the correct 
@@ -234,13 +234,13 @@ def check_valid_surv_desig(input_desig):
     """
 
     try:
-        input_str = str(input_desig).strip()
-        return check_packed_unpacked(input_str, reSurv, rePackedSurv)
-    except:
+        designation: str = str(designation).strip()
+        return check_packed_unpacked(designation, reSurv, rePackedSurv)
+    except AttributeError:
         return False
 
 
-def check_valid_num_desig(input_des):
+def check_valid_num_desig(designation: str) -> bool:
     """
     Check whether the input string or number is a valid numbered designation 
     (whether packed or unpacked), e.g. (1) Ceres, (1), 1, 00001, A1203, 101203,
@@ -265,30 +265,30 @@ def check_valid_num_desig(input_des):
     """
 
     try:
-        input_desig = str(input_des).strip()
-    except:
-        # something is wrong... Is it an array or a list?
+        designation = str(designation).strip()
+    except AttributeError:
+        # Is it an array or a list?
         return False
 
     # can we transform it into a single string with digits?
-    if input_desig.strip().isdigit():
-        if does_it_match_re(input_desig, reNum):
+    if designation.isdigit():
+        if does_it_match_re(designation, reNum):
             return True
         else:
             # It should not be longer than 8 digit characters long (in 2020!)
             return False
-    elif does_it_match_re(input_desig, rePackedLong):
+    elif does_it_match_re(designation, rePackedLong):
         return True
-    elif does_it_match_re(input_desig, rePackedNum):
+    elif does_it_match_re(designation, rePackedNum):
         return True
-    elif does_it_match_re(input_desig, reNum):
+    elif does_it_match_re(designation, reNum):
         # => must still be of the type "(1) Ceres"
         return True
     else:
         return False
 
 
-def check_valid_prov_desig(input_desig):
+def check_valid_prov_desig(input_desig: str) -> bool:
     """
     Check whether the input string or number is a valid provisional designation 
     (whether packed or unpacked), e.g. 2008 EV5, 2008EV5, ... or K08E05V. It 
@@ -301,9 +301,11 @@ def check_valid_prov_desig(input_desig):
     *Return: boolean
     """
 
-    input_str = str(input_desig).strip()
-    return check_packed_unpacked(input_str, reProv, rePackedProv)
-
+    try:
+        input_str = str(input_desig).strip()
+        return check_packed_unpacked(input_str, reProv, rePackedProv)
+    except AttributeError:
+        return False
 
 
 def check_valid_desig(input_des):
