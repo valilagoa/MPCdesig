@@ -268,7 +268,7 @@ def check_valid_num_desig(input_des):
     """
 
     try:
-        input_desig = str(input_des)
+        input_desig = str(input_des).strip()
     except:
         # something is wrong... Is it an array or a list?
         return False
@@ -304,11 +304,9 @@ def check_valid_prov_desig(input_desig):
     *Return: boolean
     """
 
-    try:
-        input_str = to_str(input_desig)
-        return check_packed_unpacked(input_str, reProv, rePackedProv)
-    except:
-        return False
+    input_str = str(input_desig).strip()
+    return check_packed_unpacked(input_str, reProv, rePackedProv)
+
 
 
 def check_valid_desig(input_des):
@@ -358,7 +356,7 @@ def does_it_match_re(input_desig, comp_re):
     return does_it
 
 
-def check_packed_unpacked(input_desig, compPacked, compUnpacked):
+def check_packed_unpacked(input_str, compPacked, compUnpacked):
     """
     Check if an input designation is a valid one according to the input 
     compiled regular expressions (they should match the type of designation you
@@ -374,7 +372,6 @@ def check_packed_unpacked(input_desig, compPacked, compUnpacked):
     *Return: boolean
     """
 
-    input_str = to_str(input_desig)
     # fa_match=compPacked.findall(input_str)
 
     if does_it_match_re(input_str, compPacked):
