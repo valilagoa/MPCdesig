@@ -603,10 +603,8 @@ def pack_prov(input_desig):
             if fa_match and len(fa_match) == 1:
                 return input_str
             else:
-                # print(errmssg)
                 return errmssg
     else:
-        # print(errmssg)
         return errmssg
 
 
