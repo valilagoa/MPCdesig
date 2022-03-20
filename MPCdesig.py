@@ -105,6 +105,7 @@ try:
     import numpy as np
     import re
     import argparse
+    from typing import Union
 
 except ModuleNotFoundError:
     sys.exit(f"\n*****\npython {version_string}: {sys.exc_info()[1]}\n*****\n")
@@ -131,7 +132,7 @@ called from the command line.
 )
 
 argParserMPC.add_argument(
-    '-d', dest='desig', type=str,
+    '-d', dest='designation', type=str,
     help='An input asteroid designation')
 
 argParserMPC.add_argument(
@@ -231,7 +232,7 @@ def is_valid_survey_designation(designation: str) -> bool:
     Check whether the input designation is a valid survey designation (packed 
     or unpacked). It simply calls check_packed_unpacked() with the correct 
     compiled regular expressions in order to improve legibility and avoid 
-    errors. See also check_valid_prov_desig().
+    errors. See also is_valid_provisional_designation().
 
     *Input: asteroid designation (string or integer)
 
@@ -266,7 +267,7 @@ def is_valid_numbered_designation(designation: str) -> bool:
     Check whether the input string or number is a valid numbered designation 
     (whether packed or unpacked), e.g. (1) Ceres, (1), 1, 00001, A1203, 101203,
     a1203, 361203, ~232s are all valid numbered designations. Unlike 
-    check_valid_prov_desig() or check_valid_surv_desig(), this does not simply 
+    is_valid_provisional_designation() or is_valid_survey_designation(), this does not simply 
     call check_packed_unpacked() because that approach would not work well
     with numbered designations (the re_numbered_designation will match anything that contains at 
     least one digit).
@@ -315,7 +316,7 @@ def is_valid_provisional_designation(designation: str) -> bool:
     (whether packed or unpacked), e.g. 2008 EV5, 2008EV5, ... or K08E05V. It 
     simply calls check_packed_unpacked() with the correct compiled regular 
     expressions in order to improve legibility and avoid errors. 
-    See also check_valid_surv_desig() and compare with is_valid_numbered_designation().
+    See also is_valid_survey_designation() and compare with is_valid_numbered_designation().
 
     *Input: an asteroid designation (string)
 
@@ -331,11 +332,11 @@ def is_valid_provisional_designation(designation: str) -> bool:
         return False
 
 
-def check_valid_desig(designation):
+def is_an_asteroid_designation(designation):
     """
     This function checks whether the input is a valid asteroid designation. It 
-    simply encapsulates calls to check_valid_prov_desig(), 
-    check_valid_surv_desig() and is_valid_numbered_designation().
+    simply encapsulates calls to is_valid_provisional_designation(), 
+    is_valid_survey_designation() and is_valid_numbered_designation().
 
     *Input: an asteroid designation (string or integer)
 
@@ -383,12 +384,12 @@ def is_packed_or_unpacked(designation: str,
     Check if an input designation is a valid one according to the input 
     compiled regular expressions (they should match the type of designation you
     are trying to verify, e.g. re_numbered_designation and re_packed_numbered_designation for numbered designations).
-    See also is_valid_numbered_designation() or check_valid_prov_desig().
+    See also is_valid_numbered_designation() or is_valid_provisional_designation().
 
-    *Input: input_desig is a string or an integer
-    *Input: compPacked is a compiled regular expression conceived to find a 
+    *Input: designation is a string or an integer
+    *Input: packed_compiled_re is a compiled regular expression conceived to find a
     certain type of packed designation, e.g. re_numbered_designation or reProv
-    *Input: compUnpacked is a compiled regular expression conceived to find a 
+    *Input: unpacked_compiled_re is a compiled regular expression conceived to find a
     certain type of unpacked designation, e.g. re_packed_numbered_designation or reProvPacked
 
     *Return: boolean
@@ -398,9 +399,9 @@ def is_packed_or_unpacked(designation: str,
         designation, unpacked_compiled_re)
 
 
-def check_single_unp_prov(input_desig):
+def is_single_unpacked_provisional(designation: str) -> bool:
     """
-    Check if the input both contain a match for a valid number designation
+    Check if the input both contains a match for a valid number designation
     and a provisional designation, e.g. "(341843) 2008 EV5". "2008 EV5" will 
     produce the same kind of match, so we must compare the matched number with
     the first part of the provisional designation. 
@@ -409,29 +410,29 @@ def check_single_unp_prov(input_desig):
 
     *Return: boolean
     """
-    final_c = False
+    is_single = False
 
-    input_d = str(input_desig).strip()
-    if is_valid_provisional_designation(input_d) and is_valid_numbered_designation(input_d):
+    designation = str(designation).strip()
+    if is_valid_provisional_designation(designation) and is_valid_numbered_designation(designation):
 
-        fa_match = re_provisional_designation.findall(input_d)
-        if fa_match:
-            first_part = fa_match[0][0]
+        found = re_provisional_designation.findall(designation)
+        if found:
+            first_part = found[0][0]
         else:
-            return final_c
-        fa_match = re_numbered_designation.findall(input_d)
-        if fa_match:
-            num = fa_match[0]
+            return is_single
+        found = re_numbered_designation.findall(designation)
+        if found:
+            num = found[0]
         else:
-            return final_c
+            return is_single
 
         if num == first_part:
-            final_c = True
+            is_single = True
 
-    return final_c
+    return is_single
 
 
-def pack_base_62(num_desig):
+def pack_base_62(designation: Union[str, int]) -> str:
     """
     Pack a numbered designation greater than 619999 following the Minor 
     Planet Center's description.
@@ -442,23 +443,22 @@ def pack_base_62(num_desig):
     """
 
     try:
-        num_int = int(num_desig) - 620000
-        resul = ""
+        number = int(designation) - 620000
+        result = ""
     except ValueError:
-        return "pack_base_62(): Error. {0} not a valid num. designation".format(
-            num_desig)
+        return f"pack_base_62(): Error. {designation} is not a valid numbered designation"
 
     for i in range(4):
-        q = num_int // 62
-        rem = num_int % 62
+        q = number // 62
+        rem = number % 62
         if rem > 9:
             rem = "{0}".format(unp2p_num[str(rem)])
-        num_int = q
-        resul = str(rem) + resul
-    return "~" + "{0}".format(resul)
+        number = q
+        result = str(rem) + result
+    return "~" + "{0}".format(result)
 
 
-def unpack_base_62(packed_desig):
+def unpack_base_62(designation: Union[str, int]) -> str:
     """
     Unpack a numbered designation greater than 619999 (e.g. "~12z3") following 
     the Minor Planet Center's specification. 
@@ -469,24 +469,24 @@ def unpack_base_62(packed_desig):
     message
     """
     error_message = "Error. {0} is not a valid packed long numbered designation".format(
-        packed_desig)
+        designation)
 
-    if not (designation_matches_compiled_re(packed_desig, re_packed_long)):
+    if not (designation_matches_compiled_re(designation, re_packed_long)):
         return "unpack_base_62(): {0}".format(error_message)
 
     suma = 0
-    packed_desig = str(packed_desig).strip()
+    designation = str(designation).strip()
     for i in range(4):
-        pos_i = packed_desig[1 + i]
+        pos_i = designation[1 + i]
         if pos_i.isdigit():
             num = int(pos_i)
         else:
-            num = int(p2unp_num[packed_desig[1 + i]])
+            num = int(p2unp_num[designation[1 + i]])
         suma += num * np.power(62, 3 - i)
     return str(suma + 620000)
 
 
-def pack_numbered_designation(designation: str):
+def pack_numbered_designation(designation: Union[str, int]) -> str:
     """
     Pack an input numbered asteroid designation, e.g. (1) Ceres, or 1 Ceres. If
     the input is already a valid numbered designation it returns it back. 
@@ -522,7 +522,7 @@ def pack_numbered_designation(designation: str):
         return error_message
 
 
-def unpack_num(input_desig):
+def unpack_num(designation: Union[str, int]) -> str:
     """
     Return the unpacked version of the input number designation if it is
     a valid packed one, or the very input if it is a valid unpacked one.
@@ -533,29 +533,26 @@ def unpack_num(input_desig):
     *Return: unpacked designation or error message
     """
 
-    error_message = """unpack_num(): Error. '{0}' not valid for unpacking""".format(
-        input_desig)
+    error_message = f"unpack_num(): Error. '{designation}' is not valid for unpacking"
 
-    input_str = to_stripped_string(input_desig)
-    if is_valid_numbered_designation(input_str):
-        fa_match = re_packed_long.findall(input_str)
-        if fa_match and len(fa_match) == 1:
-            return unpack_base_62(input_str)
+    designation = str(designation).strip()
+    if is_valid_numbered_designation(designation):
+        found = re_packed_long.findall(designation)
+        if found and len(found) == 1:
+            return unpack_base_62(designation)
         else:
-            fa_match = re_packed_numbered_designation.findall(input_desig)
-            if fa_match and len(fa_match) == 1:
-                frst = p2unp_num[fa_match[0][0]]
-                return frst + fa_match[0][1]
+            found = re_packed_numbered_designation.findall(designation)
+            if found and len(found) == 1:
+                first = p2unp_num[found[0][0]]
+                return first + found[0][1]
             else:
-                fa_match = re_numbered_designation.findall(input_desig)
-                return "{0:d}".format(int(fa_match[0]))
-
+                found = re_numbered_designation.findall(designation)
+                return "{0:d}".format(int(found[0]))
     else:
-        # print(error_message)
         return error_message
 
 
-def pack_prov(input_desig):
+def pack_provisional_designation(designation: Union[str, int]) -> str:
     """Pack an input designation if it is a valid provisional asteroid 
     designation. For example, 
 
@@ -574,50 +571,48 @@ def pack_prov(input_desig):
     *Return: a string with the packed form of the input or an error message
     """
 
-    error_message = """pack_prov(): Error. '{0}' not valid for packing""".format(
-        input_desig)
+    error_message = f"pack_provisional_designation(): Error. '{designation}' is not valid for packing"
 
-    input_str = to_stripped_string(input_desig)
-    if is_valid_provisional_designation(input_str):
+    designation = str(designation).strip()
+    if is_valid_provisional_designation(designation):
 
-        fa_match = re_provisional_designation.findall(input_str)
-        if fa_match and len(fa_match) == 1:
+        found = re_provisional_designation.findall(designation)
+        if found and len(found) == 1:
             # It must have worked:
-            # so fa_match must be of the form:
+            # so found must be of the form:
             # [('1923', '-', 'AG', '342')]
             #
             # year 1923 -> frst=19, scnd=23
-            frst = unp2p_prov[fa_match[0][0][0:2]]
-            scnd = fa_match[0][0][2:]
+            first = unp2p_prov[found[0][0][0:2]]
+            second = found[0][0][2:]
 
             # half-month period, e.g. ABnumb -> ApackedB
-            frst_hm = fa_match[0][2][0]
-            scnd_hm = fa_match[0][2][1]
+            first_hm = found[0][2][0]
+            second_hm = found[0][2][1]
 
-            num_str = fa_match[0][3]
-            if len(num_str) == 0:
-                mid = "00"
-            elif len(num_str) > 2:
+            number_part = found[0][3]
+            if len(number_part) == 0:
+                middle_part = "00"
+            elif len(number_part) > 2:
                 # We pack the two first numbers
-                mid = unp2p_num[num_str[0:2]] + num_str[2]
+                middle_part = unp2p_num[number_part[0:2]] + number_part[2]
             else:
-                mid = "{0:02d}".format(int(num_str))
+                middle_part = "{0:02d}".format(int(number_part))
 
-            return frst + scnd + frst_hm + mid + scnd_hm
+            return first + second + first_hm + middle_part + second_hm
 
         else:
             # It might be already packed:
-            fa_match = re_packed_provisional_designation.findall(input_str)
-            if fa_match and len(fa_match) == 1:
-                return input_str
+            found = re_packed_provisional_designation.findall(designation)
+            if found and len(found) == 1:
+                return designation
             else:
                 return error_message
     else:
-        # print(error_message)
         return error_message
 
 
-def unpack_prov(input_desig, separator):
+def unpack_provisional(designation: Union[str, int], separator: str):
     """Return the unpacked version of the input provisional designation if 
     it is a valid packed one, or the very input if it is a valid unpacked one.
     
@@ -628,38 +623,36 @@ def unpack_prov(input_desig, separator):
     *Return: unpacked provisional designation (str) or an error message
     """
 
-    error_message = """unpack_prov(): Error. '{0}' not valid for unpacking""".format(
-        input_desig)
+    error_message = f"unpack_provisional(): Error. '{designation}' not valid for unpacking"
 
-    input_str = re.sub("[ _]", "-", to_stripped_string(input_desig), count=1)
-    if is_valid_provisional_designation(input_str):
-        fa_match = re_provisional_designation.findall(input_str)
-        if fa_match and len(fa_match) == 1:
+    designation = re.sub("[ _]", "-", str(designation).strip(), count=1)
+    if is_valid_provisional_designation(designation):
+        found = re_provisional_designation.findall(designation)
+        if found and len(found) == 1:
             # it is a valid provisional designation, already unpacked, so
             # we just insert the input separator
-            return fa_match[0][0] + separator + fa_match[0][2] + fa_match[0][3]
+            return found[0][0] + separator + found[0][2] + found[0][3]
 
-        fa_match = re_packed_provisional_designation.findall(input_desig)
-        frst_y = p2unp_prov[fa_match[0][0]]
-        scnd_y = fa_match[0][1]
-        frst_fn = fa_match[0][2]
-        scnd_fn = fa_match[0][5]
+        found = re_packed_provisional_designation.findall(designation)
+        year_part_1 = p2unp_prov[found[0][0]]
+        year_part_2 = found[0][1]
+        frst_fn = found[0][2]
+        scnd_fn = found[0][5]
         try:
-            n1 = int(fa_match[0][3])
+            n1 = int(found[0][3])
             if n1 < 1:
                 n1 = ""
             else:
                 n1 = str(n1)
-        except:
-            n1 = p2unp_num[fa_match[0][3][0]]
+        except ValueError:
+            n1 = p2unp_num[found[0][3][0]]
 
-        n2 = fa_match[0][4]
-        if int(fa_match[0][4]) < 1:
+        n2 = found[0][4]
+        if int(found[0][4]) < 1:
             n2 = ""
 
-        return frst_y + scnd_y + separator + frst_fn + scnd_fn + n1 + n2
+        return year_part_1 + year_part_2 + separator + frst_fn + scnd_fn + n1 + n2
     else:
-        # print(error_message)
         return error_message
 
 
@@ -731,7 +724,7 @@ def unpack(input_desig, separator):
 
     input_d = to_stripped_string(input_desig)
 
-    single_provis = check_single_unp_prov(input_d)
+    single_provis = is_single_unpacked_provisional(input_d)
 
     if is_valid_survey_designation(input_d):
         if is_unpacked_survey_designation(input_d):
@@ -741,7 +734,7 @@ def unpack(input_desig, separator):
     elif is_valid_numbered_designation(input_d) and not single_provis:
         return unpack_num(input_d)
     elif is_valid_provisional_designation(input_d):
-        return unpack_prov(input_d, str(separator))
+        return unpack_provisional(input_d, str(separator))
 
     else:
         # print(error_message)
@@ -763,19 +756,19 @@ def pack(input_desig):
 
     input_d = to_stripped_string(input_desig)
 
-    single_provis = check_single_unp_prov(input_d)
+    single_provis = is_single_unpacked_provisional(input_d)
 
     if is_valid_survey_designation(input_d):
         return pack_survey_desig(input_d)
     elif is_valid_numbered_designation(input_d) and not (single_provis):
         return pack_numbered_designation(input_d)
     elif is_valid_provisional_designation(input_d):
-        return pack_prov(input_d)
+        return pack_provisional_designation(input_d)
     else:
         return error_message
 
 
-def convert(inp, p_or_unp):
+def convert(input_, p_or_unp):
     """
     Pack or unpack the input designation or file with designations. This is 
     simply the main() function but without using the argument parser and a 
@@ -792,31 +785,30 @@ def convert(inp, p_or_unp):
     *Return: string with output or an error message
     """
 
-    input_ = str(inp)
-    if len(input_) > 0 and check_valid_desig(input_):
+    input_ = str(input_)
+    if len(input_) > 0 and is_an_asteroid_designation(input_):
         designations = [input_]
         # Create a list with the input so that we can iterate over it
     else:
         try:
             # Perhaps it is an input filename, not a designation
-            myfile = open(input_, 'r')
-            designations = myfile.readlines()
-            myfile.close()
+            my_file = open(input_, 'r')
+            designations = my_file.readlines()
+            my_file.close()
         except IOError:
             print("convert(): Error. Did not find file '{0}'".format(input_))
             designations = []
-            # We still need an empty list to iterate over next
+            # We still need an empty list to iterate over
 
     for designation in designations:
         if len(designation.split()) < 1:
             print("convert(): Warning. Input is an empty line")
+        elif "unpack" in p_or_unp:
+            print(unpack(designation.replace("\n", ""), "_"))
+        elif len(p_or_unp) == 4 and "pack" in p_or_unp:
+            print(pack(designation.replace("\n", "")))
         else:
-            if p_or_unp == "pack":
-                print(pack(designation.replace("\n", "")))
-            elif p_or_unp == "unpack":
-                print(unpack(designation.replace("\n", ""), "_"))
-            else:
-                print("convert(): Error. 2nd arg. must be 'pack' or 'unpack'")
+            print("convert(): Error. 2nd arg. must be 'pack' or 'unpack'")
 
 
 def main():
@@ -826,9 +818,9 @@ def main():
         print("main(): Error. Either -p or -u must be used")
         sys.exit(-1)
 
-    if parsed.desig:
+    if parsed.designation:
         # if we parsed a designation, we have a list with one element
-        designations = [parsed.desig]
+        designations = [parsed.designation]
 
     elif parsed.filename:
         filename = str(parsed.filename)
