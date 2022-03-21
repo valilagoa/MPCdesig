@@ -681,7 +681,7 @@ def pack_survey_desig(input_desig):
         return "pack_survey_desig(): Error. {0}".format(error_message)
 
 
-def unpack_survey_desig(input_desig):
+def unpack_survey_designation(designation: str) -> str:
     """
     Unpack a special survey asteroid designation.
 
@@ -690,21 +690,21 @@ def unpack_survey_desig(input_desig):
     *Return: a string with the packed designation or an error message
     """
 
-    error_message = "{0} is not a valid special survey designation".format(input_desig)
+    error_message = f"{designation} is not a valid special survey designation"
 
-    des = to_stripped_string(input_desig)
+    designation = str(designation).strip()
 
-    if des.isdigit():
+    if designation.isdigit():
         # This should not happen, by definition
-        return "unpack_survey_desig(): Error. {0}".format(error_message)
+        return f"unpack_survey_designation(): Error. {error_message}"
 
     try:
-        numbers = des[3:]
-        lett1 = des[0]
-        lett2 = des[1]
-        return numbers + " " + lett1 + "-" + lett2
-    except:
-        return "unpack_survey_desig(): Error. {0}".format(error_message)
+        numbers = designation[3:]
+        letter1 = designation[0]
+        letter2 = designation[1]
+        return numbers + " " + letter1 + "-" + letter2
+    except IndexError:
+        return f"unpack_survey_designation(): Error. {error_message}"
 
 
 def unpack(input_desig, separator):
@@ -730,7 +730,7 @@ def unpack(input_desig, separator):
         if is_unpacked_survey_designation(input_d):
             return input_d
         else:
-            return unpack_survey_desig(input_d)
+            return unpack_survey_designation(input_d)
     elif is_valid_numbered_designation(input_d) and not single_provis:
         return unpack_num(input_d)
     elif is_valid_provisional_designation(input_d):
