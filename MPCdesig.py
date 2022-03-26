@@ -117,7 +117,7 @@ argParserMPC = argparse.ArgumentParser(
     description="""
   Functions for packing and unpacking asteroid designations with different
 formats using regular expressions in Python 3. "Packing" refers to the Minor
-Planet Center convention. Numbered designations greater than 619999 are 
+Planet Center convention. Number designations greater than 619999 are 
 also handled. It also works as a script directly called from the command line. 
 
   Example:
@@ -158,7 +158,7 @@ argParserMPC.add_argument(
 p2unp_prov = dict([('I', '18'), ('J', '19'), ('K', '20')])
 unp2p_prov = dict([('18', 'I'), ('19', 'J'), ('20', 'K')])
 
-# packed numbered to unpacked numbered and vice versa
+# packed number to unpacked number and vice versa
 number_from_letter = dict([('A', '10'), ('B', '11'), ('C', '12'), ('D', '13'),
                            ('E', '14'), ('F', '15'), ('G', '16'), ('H', '17'),
                            ('I', '18'), ('J', '19'), ('K', '20'), ('L', '21'),
@@ -192,9 +192,9 @@ letter_from_number = dict([('00', '0'),
 # Compiled regular expressions
 #
 
-re_numbered_designation = re.compile(r"^[(]?(\d{1,8})[)]?\b")
+re_number_designation = re.compile(r"^[(]?(\d{1,8})[)]?\b")
 
-re_packed_numbered_designation = re.compile(r"\b([~a-zA-Z])(\d{4})\b")
+re_packed_number_designation = re.compile(r"\b([~a-zA-Z])(\d{4})\b")
 # matches e.g. A3434, g3434
 # but not A343 or g34343
 
@@ -260,20 +260,20 @@ def is_packed_survey_designation(designation: str) -> bool:
         return False
 
 
-def is_valid_numbered_designation(designation: str) -> bool:
+def is_valid_number_designation(designation: Union[str, int]) -> bool:
     """
     Check whether the input string or number is a valid number designation
     (whether packed or unpacked), e.g. (1) Ceres, (1), 1, 00001, A1203, 101203,
     a1203, 361203, ~232s are all valid number designations. Unlike
     is_valid_provisional_designation() or is_valid_survey_designation(), this does not simply 
     call check_packed_unpacked() because that approach would not work well
-    with numbered designations (the re_numbered_designation will match anything that contains at 
+    with number designations (the re_number_designation will match anything that contains at
     least one digit).
 
     Names or anything written after a matched designation are ignored except
     when they lead to one or more matches. For example, "(1) Ceres" will return
     True, but "(1) Cer3s" will not, because the 3 will also be matched by the 
-    regular expression searching for numbered designations, and I assume this
+    regular expression searching for number designations, and I assume this
     should not happen. This criterion is admittedly arbitrary, but it can help
     detect errors in an input list, for example if there are missing carriage 
     returns. This also assumes that no "given name" (Ceres, Pallas, ...) should
@@ -292,16 +292,16 @@ def is_valid_numbered_designation(designation: str) -> bool:
 
     # can we transform it into a single string with digits?
     if designation.isdigit():
-        if designation_matches_compiled_re(designation, re_numbered_designation):
+        if designation_matches_compiled_re(designation, re_number_designation):
             return True
         else:
             # It should not be longer than 8 digit characters long (in 2020!)
             return False
     elif designation_matches_compiled_re(designation, re_packed_long):
         return True
-    elif designation_matches_compiled_re(designation, re_packed_numbered_designation):
+    elif designation_matches_compiled_re(designation, re_packed_number_designation):
         return True
-    elif designation_matches_compiled_re(designation, re_numbered_designation):
+    elif designation_matches_compiled_re(designation, re_number_designation):
         # => must still be of the type "(1) Ceres"
         return True
     else:
@@ -314,7 +314,7 @@ def is_valid_provisional_designation(designation: str) -> bool:
     (whether packed or unpacked), e.g. 2008 EV5, 2008EV5, ... or K08E05V. It 
     simply calls check_packed_unpacked() with the correct compiled regular 
     expressions in order to improve legibility and avoid errors. 
-    See also is_valid_survey_designation() and compare with is_valid_numbered_designation().
+    See also is_valid_survey_designation() and compare with is_valid_number_designation().
 
     *Input: an asteroid designation (string)
 
@@ -334,7 +334,7 @@ def is_an_asteroid_designation(designation):
     """
     This function checks whether the input is a valid asteroid designation. It 
     simply encapsulates calls to is_valid_provisional_designation(), 
-    is_valid_survey_designation() and is_valid_numbered_designation().
+    is_valid_survey_designation() and is_valid_number_designation().
 
     *Input: an asteroid designation (string or integer)
 
@@ -345,7 +345,7 @@ def is_an_asteroid_designation(designation):
         return True
     elif is_valid_survey_designation(designation):
         return True
-    elif is_valid_numbered_designation(designation):
+    elif is_valid_number_designation(designation):
         return True
     else:
         return False
@@ -381,14 +381,14 @@ def is_packed_or_unpacked(designation: str,
     """
     Check if an input designation is a valid one according to the input 
     compiled regular expressions (they should match the type of designation you
-    are trying to verify, e.g. re_numbered_designation and re_packed_numbered_designation for numbered designations).
-    See also is_valid_numbered_designation() or is_valid_provisional_designation().
+    are trying to verify, e.g. re_number_designation and re_packed_number_designation for number designations).
+    See also is_valid_number_designation() or is_valid_provisional_designation().
 
     *Input: designation is a string or an integer
     *Input: packed_compiled_re is a compiled regular expression conceived to find a
-    certain type of packed designation, e.g. re_numbered_designation or reProv
+    certain type of packed designation, e.g. re_number_designation or reProv
     *Input: unpacked_compiled_re is a compiled regular expression conceived to find a
-    certain type of unpacked designation, e.g. re_packed_numbered_designation or reProvPacked
+    certain type of unpacked designation, e.g. re_packed_number_designation or reProvPacked
 
     *Return: boolean
     """
@@ -411,14 +411,14 @@ def is_single_unpacked_provisional(designation: str) -> bool:
     is_single = False
 
     designation = str(designation).strip()
-    if is_valid_provisional_designation(designation) and is_valid_numbered_designation(designation):
+    if is_valid_provisional_designation(designation) and is_valid_number_designation(designation):
 
         found = re_provisional_designation.findall(designation)
         if found:
             first_part = found[0][0]
         else:
             return is_single
-        found = re_numbered_designation.findall(designation)
+        found = re_number_designation.findall(designation)
         if found:
             num = found[0]
         else:
@@ -432,10 +432,10 @@ def is_single_unpacked_provisional(designation: str) -> bool:
 
 def pack_base_62(designation: Union[str, int]) -> str:
     """
-    Pack a numbered designation greater than 619999 following the Minor 
+    Pack a number designation greater than 619999 following the Minor
     Planet Center's description.
 
-    *Input: a valid numbered designation (string or integer)
+    *Input: a valid number designation (string or integer)
     *Return: a string with the corresponding packed designation or an error 
     message
     """
@@ -444,7 +444,7 @@ def pack_base_62(designation: Union[str, int]) -> str:
         number = int(designation) - 620000
         result = ""
     except ValueError:
-        return f"pack_base_62(): Error. {designation} is not a valid numbered designation"
+        return f"pack_base_62(): Error. {designation} is not a valid number designation"
 
     for i in range(4):
         q = number // 62
@@ -458,17 +458,17 @@ def pack_base_62(designation: Union[str, int]) -> str:
 
 def unpack_base_62(designation: Union[str, int]) -> str:
     """
-    Unpack a numbered designation greater than 619999 (e.g. "~12z3") following 
+    Unpack a number designation greater than 619999 (e.g. "~12z3") following
     the Minor Planet Center's specification. 
 
-    *Input: a valid packed numbered designation (string or integer)
+    *Input: a valid packed number designation (string or integer)
 
     *Return: string with the corresponding unpacked designation or an error 
     message
     """
 
     if not (designation_matches_compiled_re(designation, re_packed_long)):
-        error_message = f"{designation} is not a valid packed long numbered designation"
+        error_message = f"{designation} is not a valid packed long number designation"
         return f"unpack_base_62(): Error. {error_message}"
 
     suma = 0
@@ -483,23 +483,23 @@ def unpack_base_62(designation: Union[str, int]) -> str:
     return str(suma + 620000)
 
 
-def pack_numbered_designation(designation: Union[str, int]) -> str:
+def pack_number_designation(designation: Union[str, int]) -> str:
     """
-    Pack an input numbered asteroid designation, e.g. (1) Ceres, or 1 Ceres. If
-    the input is already a valid numbered designation it simply returns it back.
+    Pack an input number asteroid designation, e.g. (1) Ceres, or 1 Ceres. If
+    the input is already a valid number designation it simply returns it back.
 
-    *Input: a valid asteroid number designation (string or a number)
+    *Input: a valid asteroid number designation (string or int)
 
     *Return: string with the MPC-packed designation or an error message
     """
 
-    error_message = f"pack_numbered_designation() error: '{designation}' not valid for packing"
+    error_message = f"pack_number_designation() error: '{designation}' not valid for packing"
 
     designation = str(designation).strip()
-    if is_valid_numbered_designation(designation):
+    if is_valid_number_designation(designation):
         try:
-            # We remove parentheses
-            number = int(re.sub("[\(\)]", "", designation.split(" ")[0]))
+            # We remove parentheses and ignore
+            number = int(re.sub(r"[()]", "", designation.split(" ")[0]))
             if number > 619999:
                 # We pack it with the base 62 notation
                 return pack_base_62(number)
@@ -533,17 +533,17 @@ def unpack_num(designation: Union[str, int]) -> str:
     error_message = f"unpack_num(): Error. '{designation}' is not valid for unpacking"
 
     designation = str(designation).strip()
-    if is_valid_numbered_designation(designation):
+    if is_valid_number_designation(designation):
         found = re_packed_long.findall(designation)
         if found and len(found) == 1:
             return unpack_base_62(designation)
         else:
-            found = re_packed_numbered_designation.findall(designation)
+            found = re_packed_number_designation.findall(designation)
             if found and len(found) == 1:
                 first = number_from_letter[found[0][0]]
                 return first + found[0][1]
             else:
-                found = re_numbered_designation.findall(designation)
+                found = re_number_designation.findall(designation)
                 return "{0:d}".format(int(found[0]))
     else:
         return error_message
@@ -730,7 +730,7 @@ def unpack(input_desig, separator):
             return input_d
         else:
             return unpack_survey_designation(input_d)
-    elif is_valid_numbered_designation(input_d) and not single_provis:
+    elif is_valid_number_designation(input_d) and not single_provis:
         return unpack_num(input_d)
     elif is_valid_provisional_designation(input_d):
         return unpack_provisional(input_d, str(separator))
@@ -759,8 +759,8 @@ def pack(input_desig):
 
     if is_valid_survey_designation(input_d):
         return pack_survey_designation(input_d)
-    elif is_valid_numbered_designation(input_d) and not single_provis:
-        return pack_numbered_designation(input_d)
+    elif is_valid_number_designation(input_d) and not single_provis:
+        return pack_number_designation(input_d)
     elif is_valid_provisional_designation(input_d):
         return pack_provisional_designation(input_d)
     else:
