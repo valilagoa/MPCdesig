@@ -135,6 +135,7 @@ function(s)&nbsp;in&nbsp;your&nbsp;own&nbsp;script(s)&nbsp;or&nbsp;module(s).&nb
 *Input:&nbsp;"pack"&nbsp;or&nbsp;"unpack"&nbsp;(no&nbsp;other&nbsp;strings&nbsp;are&nbsp;valid)<br>
 &nbsp;<br>
 *Return:&nbsp;string&nbsp;with&nbsp;output&nbsp;or&nbsp;an&nbsp;error&nbsp;message</tt></dd></dl>
+ <dl><dt><a name="-decode_letter"><strong>decode_letter</strong></a>(character: str) -&gt; str</dt><dd><tt>A&nbsp;-&gt;&nbsp;10,&nbsp;B&nbsp;-&gt;&nbsp;11,&nbsp;...&nbsp;z&nbsp;-&gt;&nbsp;61</tt></dd></dl>
  <dl><dt><a name="-designation_matches_compiled_re"><strong>designation_matches_compiled_re</strong></a>(designation: str, compiled_re: &lt;module 're' from '/usr/lib/python3.8/re.py'&gt;) -&gt; bool</dt><dd><tt>Check&nbsp;whether&nbsp;the&nbsp;input&nbsp;asteroid&nbsp;designation&nbsp;is&nbsp;matched&nbsp;by&nbsp;the&nbsp;input&nbsp;<br>
 compiled&nbsp;regular&nbsp;expressions.<br>
 &nbsp;<br>
@@ -142,6 +143,9 @@ compiled&nbsp;regular&nbsp;expressions.<br>
 *Input:&nbsp;a&nbsp;compiled&nbsp;regular&nbsp;expression<br>
 &nbsp;<br>
 *Return:&nbsp;boolean</tt></dd></dl>
+ <dl><dt><a name="-encode_cyphers"><strong>encode_cyphers</strong></a>(cyphers: Union[str, int]) -&gt; str</dt><dd><tt>10&nbsp;-&gt;&nbsp;A,&nbsp;11&nbsp;-&gt;&nbsp;B,&nbsp;...&nbsp;61&nbsp;&gt;&nbsp;z</tt></dd></dl>
+ <dl><dt><a name="-get_packing_dictionaries"><strong>get_packing_dictionaries</strong></a>() -&gt; Tuple[dict, dict]</dt><dd><tt>Returns&nbsp;two&nbsp;dictionaries,&nbsp;one&nbsp;to&nbsp;decode&nbsp;a&nbsp;letter&nbsp;into&nbsp;two&nbsp;digits,<br>
+one&nbsp;to&nbsp;encode&nbsp;two&nbsp;digits&nbsp;into&nbsp;letters</tt></dd></dl>
  <dl><dt><a name="-is_an_asteroid_designation"><strong>is_an_asteroid_designation</strong></a>(designation)</dt><dd><tt>This&nbsp;function&nbsp;checks&nbsp;whether&nbsp;the&nbsp;input&nbsp;is&nbsp;a&nbsp;valid&nbsp;asteroid&nbsp;designation.&nbsp;It&nbsp;<br>
 simply&nbsp;encapsulates&nbsp;calls&nbsp;to&nbsp;<a href="#-is_valid_provisional_designation">is_valid_provisional_designation</a>(),&nbsp;<br>
 <a href="#-is_valid_survey_designation">is_valid_survey_designation</a>()&nbsp;and&nbsp;<a href="#-is_valid_number_designation">is_valid_number_designation</a>().<br>
@@ -295,11 +299,11 @@ designation<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>Union</strong> = typing.Union<br>
+<td width="100%"><strong>Tuple</strong> = typing.Tuple<br>
+<strong>Union</strong> = typing.Union<br>
 <strong>argParserMPC</strong> = ArgumentParser(prog='pydoc', usage=None, descrip...atter'&gt;, conflict_handler='error', add_help=True)<br>
-<strong>letter_from_number</strong> = {'00': '0', '10': 'A', '11': 'B', '12': 'C', '13': 'D', '14': 'E', '15': 'F', '16': 'G', '17': 'H', '18': 'I', ...}<br>
-<strong>number_from_letter</strong> = {'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15', 'G': '16', 'H': '17', 'I': '18', 'J': '19', ...}<br>
-<strong>p2unp_prov</strong> = {'I': '18', 'J': '19', 'K': '20'}<br>
+<strong>decode_year</strong> = {'I': '18', 'J': '19', 'K': '20'}<br>
+<strong>encode_year</strong> = {'18': 'I', '19': 'J', '20': 'K'}<br>
 <strong>re6digits</strong> = re.compile('\\b(\\d{2,})(\\d{4})\\b')<br>
 <strong>re_number_designation</strong> = re.compile('^[(]?(\\d{1,8})[)]?\\b')<br>
 <strong>re_packed_long</strong> = re.compile('(~)([0-9a-zA-Z]{4})\\b')<br>
@@ -308,6 +312,5 @@ designation<br>
 <strong>re_packed_survey</strong> = re.compile('\\b([PT])([L123])S(\\d{4})\\b')<br>
 <strong>re_provisional_designation</strong> = re.compile('\\b(\\d{4})([- _]?)([a-zA-Z]{2})(\\d*)\\b')<br>
 <strong>re_survey</strong> = re.compile('\\b(\\d{4})[- _]([PT])-([L123])\\b')<br>
-<strong>unp2p_prov</strong> = {'18': 'I', '19': 'J', '20': 'K'}<br>
 <strong>version_string</strong> = '3.8.10'</td></tr></table>
 </body></html>
