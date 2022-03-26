@@ -430,35 +430,31 @@ def is_packed_or_unpacked(designation: str,
 
 def is_single_unpacked_provisional(designation: str) -> bool:
     """
-    Check if the input both contains a match for a valid number designation
-    and a provisional designation, e.g. "(341843) 2008 EV5". "2008 EV5" will 
-    produce the same kind of match, so we must compare the matched number with
-    the first part of the provisional designation. 
+    An unpacked provisional designation will be (mistakenly) identified as a valid
+    numbered designation by is_valid_provisional_designation() because the second
+    part is ignored. A single provisional designation has the property that its
+    "wrongly" parsed number designation must be equal to its year part. For instance
+    "(341843) 2008 EV5 plus ignored text" will return False in this case, but
+    "2008 EV5 plus further ignored text" will return True.
 
-    *Input: an asteroid designation (string or int)
+    *Input: an asteroid designation (string)
 
     *Return: boolean
     """
-    is_single = False
 
     designation = str(designation).strip()
     if is_valid_provisional_designation(designation) and is_valid_number_designation(designation):
 
         found = re_provisional_designation.findall(designation)
-        if found:
-            first_part = found[0][0]
-        else:
-            return is_single
+        year = found[0][0]
+
         found = re_number_designation.findall(designation)
-        if found:
-            num = found[0]
-        else:
-            return is_single
+        matched_number = found[0]
 
-        if num == first_part:
-            is_single = True
+        if matched_number == year:
+            return True
 
-    return is_single
+    return False
 
 
 def pack_base_62(designation: Union[str, int]) -> str:
@@ -767,7 +763,6 @@ def unpack(input_desig, separator):
         return unpack_provisional(input_d, str(separator))
 
     else:
-        # print(error_message)
         return error_message
 
 
