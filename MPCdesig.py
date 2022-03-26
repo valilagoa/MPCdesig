@@ -9,11 +9,11 @@ Number designations greater than 619999 can also be packed and unpacked.
 
 The two main purposes of **MPCdesig** are:
   - to quickly and easily convert a single designation from the command line, 
-  for example unpack K08E05V into 2008 EV5 or pack 620000 into ~0000. 
-  - to pack or unpack a list of designations, leaving those which are 
-  already in the target format unchanged. This is especially helpful when you 
-  regularly work with lists of asteroids gathered from different sources that
-  use different formats.
+  for example, K08E05V into 2008 EV5 or 620000 into ~0000.
+  - to pack or unpack a list of designations leaving unchanged those which are
+  already in the target format. This is especially helpful when you regularly
+  work with lists of asteroids in different formats gathered from different
+  sources or colleagues.
   
 The module is more easily used as a script, i.e. directly from the console with
 a command specifying your input designation or the name of a file containing 
@@ -71,20 +71,20 @@ and
 ``` 
 python MPCdesig.py -f example_list.txt -p 
 ```
-and compare the outputs with the input. 
-You can see that for input designations that are already unpacked (e.g. the 
-first three), the output is the same, either the unpacked form without 
-parentheses and without the name or any other strings given afterwards, or the 
-1 padded with four 0s. 
+and compare the outputs with the input. For example, input designations that
+are already unpacked (e.g. the first three) are not changed and parentheses
+on number designations and names are removed. In fact, anything after a
+valid designation is parsed is ignored, as explained next.
 
 
 ## Caveat/Warning
 
 The pack() and unpack() functions will try to convert the first substring that 
-is matched on every line so they assume that each line corresponds to one and 
+is matched on every line, so they assume that each line corresponds to one and
 only one asteroid. This does not mean that each line cannot contain more than 
 one designation, e.g. "(341843) 2008 EV5" would be a valid input line. In such
-cases, however, the numbered designation is packed or unpacked. 
+cases, however, only first valid designation, i.e. the number, is packed or
+unpacked.
 
 Although I have tested the module before release, you will surely find bugs and 
 cases that should be handled correctly but for which the module will not work. 
@@ -117,9 +117,8 @@ argParserMPC = argparse.ArgumentParser(
     description="""
   Functions for packing and unpacking asteroid designations with different
 formats using regular expressions in Python 3. "Packing" refers to the Minor
-Planet Center convention. The "new" packing format for numbered designations 
-greater than 619999 are also handled. It also works as a script directly 
-called from the command line. 
+Planet Center convention. Numbered designations greater than 619999 are 
+also handled. It also works as a script directly called from the command line. 
 
   Example:
   We can pack the provisional designation "2008 EV5" into "K08E05V". Accepted
@@ -145,8 +144,7 @@ argParserMPC.add_argument(
 
 argParserMPC.add_argument(
     '-s', dest='separator', default=" ",
-    help="""
-Separator character for provis. designations.\n
+    help="""Separator character for provis. designations.\n
 Default '_' (e.g. 2008_EV5)""")
 
 argParserMPC.add_argument(
@@ -161,34 +159,34 @@ p2unp_prov = dict([('I', '18'), ('J', '19'), ('K', '20')])
 unp2p_prov = dict([('18', 'I'), ('19', 'J'), ('20', 'K')])
 
 # packed numbered to unpacked numbered and vice versa
-p2unp_num = dict([('A', '10'), ('B', '11'), ('C', '12'), ('D', '13'),
-                  ('E', '14'), ('F', '15'), ('G', '16'), ('H', '17'),
-                  ('I', '18'), ('J', '19'), ('K', '20'), ('L', '21'),
-                  ('M', '22'), ('N', '23'), ('O', '24'), ('P', '25'),
-                  ('Q', '26'), ('R', '27'), ('S', '28'), ('T', '29'),
-                  ('U', '30'), ('V', '31'), ('W', '32'), ('X', '33'),
-                  ('Y', '34'), ('Z', '35'), ('a', '36'), ('b', '37'),
-                  ('c', '38'), ('d', '39'), ('e', '40'), ('f', '41'),
-                  ('g', '42'), ('h', '43'), ('i', '44'), ('j', '45'),
-                  ('k', '46'), ('l', '47'), ('m', '48'), ('n', '49'),
-                  ('o', '50'), ('p', '51'), ('q', '52'), ('r', '53'),
-                  ('s', '54'), ('t', '55'), ('u', '56'), ('v', '57'),
-                  ('w', '58'), ('x', '59'), ('y', '60'), ('z', '61')])
+number_from_letter = dict([('A', '10'), ('B', '11'), ('C', '12'), ('D', '13'),
+                           ('E', '14'), ('F', '15'), ('G', '16'), ('H', '17'),
+                           ('I', '18'), ('J', '19'), ('K', '20'), ('L', '21'),
+                           ('M', '22'), ('N', '23'), ('O', '24'), ('P', '25'),
+                           ('Q', '26'), ('R', '27'), ('S', '28'), ('T', '29'),
+                           ('U', '30'), ('V', '31'), ('W', '32'), ('X', '33'),
+                           ('Y', '34'), ('Z', '35'), ('a', '36'), ('b', '37'),
+                           ('c', '38'), ('d', '39'), ('e', '40'), ('f', '41'),
+                           ('g', '42'), ('h', '43'), ('i', '44'), ('j', '45'),
+                           ('k', '46'), ('l', '47'), ('m', '48'), ('n', '49'),
+                           ('o', '50'), ('p', '51'), ('q', '52'), ('r', '53'),
+                           ('s', '54'), ('t', '55'), ('u', '56'), ('v', '57'),
+                           ('w', '58'), ('x', '59'), ('y', '60'), ('z', '61')])
 
-unp2p_num = dict([('00', '0'),
-                  ('10', 'A'), ('11', 'B'), ('12', 'C'), ('13', 'D'),
-                  ('14', 'E'), ('15', 'F'), ('16', 'G'), ('17', 'H'),
-                  ('18', 'I'), ('19', 'J'), ('20', 'K'), ('21', 'L'),
-                  ('22', 'M'), ('23', 'N'), ('24', 'O'), ('25', 'P'),
-                  ('26', 'Q'), ('27', 'R'), ('28', 'S'), ('29', 'T'),
-                  ('30', 'U'), ('31', 'V'), ('32', 'W'), ('33', 'X'),
-                  ('34', 'Y'), ('35', 'Z'), ('36', 'a'), ('37', 'b'),
-                  ('38', 'c'), ('39', 'd'), ('40', 'e'), ('41', 'f'),
-                  ('42', 'g'), ('43', 'h'), ('44', 'i'), ('45', 'j'),
-                  ('46', 'k'), ('47', 'l'), ('48', 'm'), ('49', 'n'),
-                  ('50', 'o'), ('51', 'p'), ('52', 'q'), ('53', 'r'),
-                  ('54', 's'), ('55', 't'), ('56', 'u'), ('57', 'v'),
-                  ('58', 'w'), ('59', 'x'), ('60', 'y'), ('61', 'z')])
+letter_from_number = dict([('00', '0'),
+                           ('10', 'A'), ('11', 'B'), ('12', 'C'), ('13', 'D'),
+                           ('14', 'E'), ('15', 'F'), ('16', 'G'), ('17', 'H'),
+                           ('18', 'I'), ('19', 'J'), ('20', 'K'), ('21', 'L'),
+                           ('22', 'M'), ('23', 'N'), ('24', 'O'), ('25', 'P'),
+                           ('26', 'Q'), ('27', 'R'), ('28', 'S'), ('29', 'T'),
+                           ('30', 'U'), ('31', 'V'), ('32', 'W'), ('33', 'X'),
+                           ('34', 'Y'), ('35', 'Z'), ('36', 'a'), ('37', 'b'),
+                           ('38', 'c'), ('39', 'd'), ('40', 'e'), ('41', 'f'),
+                           ('42', 'g'), ('43', 'h'), ('44', 'i'), ('45', 'j'),
+                           ('46', 'k'), ('47', 'l'), ('48', 'm'), ('49', 'n'),
+                           ('50', 'o'), ('51', 'p'), ('52', 'q'), ('53', 'r'),
+                           ('54', 's'), ('55', 't'), ('56', 'u'), ('57', 'v'),
+                           ('58', 'w'), ('59', 'x'), ('60', 'y'), ('61', 'z')])
 
 ################################################################################
 # Compiled regular expressions
@@ -264,9 +262,9 @@ def is_packed_survey_designation(designation: str) -> bool:
 
 def is_valid_numbered_designation(designation: str) -> bool:
     """
-    Check whether the input string or number is a valid numbered designation 
+    Check whether the input string or number is a valid number designation
     (whether packed or unpacked), e.g. (1) Ceres, (1), 1, 00001, A1203, 101203,
-    a1203, 361203, ~232s are all valid numbered designations. Unlike 
+    a1203, 361203, ~232s are all valid number designations. Unlike
     is_valid_provisional_designation() or is_valid_survey_designation(), this does not simply 
     call check_packed_unpacked() because that approach would not work well
     with numbered designations (the re_numbered_designation will match anything that contains at 
@@ -452,7 +450,7 @@ def pack_base_62(designation: Union[str, int]) -> str:
         q = number // 62
         rem = number % 62
         if rem > 9:
-            rem = "{0}".format(unp2p_num[str(rem)])
+            rem = "{0}".format(letter_from_number[str(rem)])
         number = q
         result = str(rem) + result
     return "~" + "{0}".format(result)
@@ -468,20 +466,19 @@ def unpack_base_62(designation: Union[str, int]) -> str:
     *Return: string with the corresponding unpacked designation or an error 
     message
     """
-    error_message = "Error. {0} is not a valid packed long numbered designation".format(
-        designation)
 
     if not (designation_matches_compiled_re(designation, re_packed_long)):
-        return "unpack_base_62(): {0}".format(error_message)
+        error_message = f"{designation} is not a valid packed long numbered designation"
+        return f"unpack_base_62(): Error. {error_message}"
 
     suma = 0
     designation = str(designation).strip()
     for i in range(4):
-        pos_i = designation[1 + i]
-        if pos_i.isdigit():
-            num = int(pos_i)
+        character_i = designation[1 + i]
+        if character_i.isdigit():
+            num = int(character_i)
         else:
-            num = int(p2unp_num[designation[1 + i]])
+            num = int(number_from_letter[designation[1 + i]])
         suma += num * np.power(62, 3 - i)
     return str(suma + 620000)
 
@@ -489,7 +486,7 @@ def unpack_base_62(designation: Union[str, int]) -> str:
 def pack_numbered_designation(designation: Union[str, int]) -> str:
     """
     Pack an input numbered asteroid designation, e.g. (1) Ceres, or 1 Ceres. If
-    the input is already a valid numbered designation it returns it back. 
+    the input is already a valid numbered designation it simply returns it back.
 
     *Input: a valid asteroid number designation (string or a number)
 
@@ -509,14 +506,14 @@ def pack_numbered_designation(designation: Union[str, int]) -> str:
             elif number > 99999:
                 # regex for the two groups to pack the first two digits:
                 found = re6digits.findall(designation)
-                pref = unp2p_num[found[0][0]]
-                return pref + found[0][1]
+                packed_part = letter_from_number[found[0][0]]
+                return packed_part + found[0][1]
             else:
                 # it requires padding
                 return "{0:05d}".format(number)
 
         except ValueError:
-            # the int() failed, so it should be a valid packed designation
+            # the int() failed, so it is already a valid packed designation
             return designation
     else:
         return error_message
@@ -543,7 +540,7 @@ def unpack_num(designation: Union[str, int]) -> str:
         else:
             found = re_packed_numbered_designation.findall(designation)
             if found and len(found) == 1:
-                first = p2unp_num[found[0][0]]
+                first = number_from_letter[found[0][0]]
                 return first + found[0][1]
             else:
                 found = re_numbered_designation.findall(designation)
@@ -582,7 +579,7 @@ def pack_provisional_designation(designation: Union[str, int]) -> str:
             # so found must be of the form:
             # [('1923', '-', 'AG', '342')]
             #
-            # year 1923 -> frst=19, scnd=23
+            # year 1923 -> first=19, second=23
             first = unp2p_prov[found[0][0][0:2]]
             second = found[0][0][2:]
 
@@ -595,7 +592,7 @@ def pack_provisional_designation(designation: Union[str, int]) -> str:
                 middle_part = "00"
             elif len(number_part) > 2:
                 # We pack the two first numbers
-                middle_part = unp2p_num[number_part[0:2]] + number_part[2]
+                middle_part = letter_from_number[number_part[0:2]] + number_part[2]
             else:
                 middle_part = "{0:02d}".format(int(number_part))
 
@@ -612,7 +609,7 @@ def pack_provisional_designation(designation: Union[str, int]) -> str:
         return error_message
 
 
-def unpack_provisional(designation: Union[str, int], separator: str):
+def unpack_provisional(designation: Union[str, int], separator: str) -> str:
     """Return the unpacked version of the input provisional designation if 
     it is a valid packed one, or the very input if it is a valid unpacked one.
     
@@ -636,27 +633,29 @@ def unpack_provisional(designation: Union[str, int], separator: str):
         found = re_packed_provisional_designation.findall(designation)
         year_part_1 = p2unp_prov[found[0][0]]
         year_part_2 = found[0][1]
-        frst_fn = found[0][2]
-        scnd_fn = found[0][5]
+        fortnight_1 = found[0][2]
+        fortnight_2 = found[0][5]
         try:
-            n1 = int(found[0][3])
-            if n1 < 1:
-                n1 = ""
+            digit_1 = int(found[0][3])
+            if digit_1 < 1:
+                digit_1 = ""
             else:
-                n1 = str(n1)
+                digit_1 = str(digit_1)
         except ValueError:
-            n1 = p2unp_num[found[0][3][0]]
+            # It is a packed number, e.g. A0 instead of 100,
+            # so we unpack it
+            digit_1 = number_from_letter[found[0][3][0]]
 
-        n2 = found[0][4]
+        digit_2 = found[0][4]
         if int(found[0][4]) < 1:
-            n2 = ""
+            digit_2 = ""
 
-        return year_part_1 + year_part_2 + separator + frst_fn + scnd_fn + n1 + n2
+        return year_part_1 + year_part_2 + separator + fortnight_1 + fortnight_2 + digit_1 + digit_2
     else:
         return error_message
 
 
-def pack_survey_desig(input_desig):
+def pack_survey_designation(designation: str) -> str:
     """
     Pack a special survey asteroid designation.
 
@@ -665,20 +664,20 @@ def pack_survey_desig(input_desig):
     *Return: a string with the packed designation or an error message
     """
 
-    error_message = "{0} is not a valid special survey designation".format(input_desig)
+    error_message = f"{designation} is not a valid special survey designation"
 
-    des = to_stripped_string(input_desig)
+    designation = str(designation).strip()
 
-    if des.isdigit():
-        return "pack_survey_desig(): Error. {0}".format(error_message)
+    if designation.isdigit():
+        return f"pack_survey_designation(): Error. {error_message}"
 
     try:
-        numbers = des[0:4]
-        lett1 = des[5]
-        lett2 = des[7]
-        return lett1 + lett2 + "S" + numbers
-    except:
-        return "pack_survey_desig(): Error. {0}".format(error_message)
+        numbers = designation[0:4]
+        first_letter = designation[5]
+        second_letter = designation[7]
+        return first_letter + second_letter + "S" + numbers
+    except IndexError:
+        return f"pack_survey_designation(): Error. {error_message}"
 
 
 def unpack_survey_designation(designation: str) -> str:
@@ -759,8 +758,8 @@ def pack(input_desig):
     single_provis = is_single_unpacked_provisional(input_d)
 
     if is_valid_survey_designation(input_d):
-        return pack_survey_desig(input_d)
-    elif is_valid_numbered_designation(input_d) and not (single_provis):
+        return pack_survey_designation(input_d)
+    elif is_valid_numbered_designation(input_d) and not single_provis:
         return pack_numbered_designation(input_d)
     elif is_valid_provisional_designation(input_d):
         return pack_provisional_designation(input_d)
@@ -824,7 +823,7 @@ def main():
 
     elif parsed.filename:
         filename = str(parsed.filename)
-        # we expect a file with many desigs
+        # we expect a file with many designations
         try:
             openfile = open(filename, 'r')
             designations = openfile.readlines()
