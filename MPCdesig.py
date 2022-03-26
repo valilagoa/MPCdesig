@@ -602,15 +602,14 @@ def pack_provisional_designation(designation: Union[str, int]) -> str:
 
         found = re_provisional_designation.findall(designation)
         if found and len(found) == 1:
-            # It must have worked:
-            # so found must be of the form:
+            # found has the form:
             # [('1923', '-', 'AG', '342')]
             #
-            # year 1923 -> first=19, second=23
+            # for year 1923 -> first=19, second=23
             first = encode_year[found[0][0][0:2]]
             second = found[0][0][2:]
 
-            # half-month period, e.g. ABnumb -> ApackedB
+            # half-month period characters, e.g. A and B in 2010 AB3
             first_hm = found[0][2][0]
             second_hm = found[0][2][1]
 
@@ -626,7 +625,7 @@ def pack_provisional_designation(designation: Union[str, int]) -> str:
             return first + second + first_hm + middle_part + second_hm
 
         else:
-            # It might be already packed:
+            # It must be already packed:
             found = re_packed_provisional_designation.findall(designation)
             if found and len(found) == 1:
                 return designation

@@ -166,12 +166,14 @@ certain&nbsp;type&nbsp;of&nbsp;unpacked&nbsp;designation,&nbsp;e.g.&nbsp;re_pack
 &nbsp;<br>
 *Return:&nbsp;boolean</tt></dd></dl>
  <dl><dt><a name="-is_packed_survey_designation"><strong>is_packed_survey_designation</strong></a>(designation: str) -&gt; bool</dt></dl>
- <dl><dt><a name="-is_single_unpacked_provisional"><strong>is_single_unpacked_provisional</strong></a>(designation: str) -&gt; bool</dt><dd><tt>Check&nbsp;if&nbsp;the&nbsp;input&nbsp;both&nbsp;contains&nbsp;a&nbsp;match&nbsp;for&nbsp;a&nbsp;valid&nbsp;number&nbsp;designation<br>
-and&nbsp;a&nbsp;provisional&nbsp;designation,&nbsp;e.g.&nbsp;"(341843)&nbsp;2008&nbsp;EV5".&nbsp;"2008&nbsp;EV5"&nbsp;will&nbsp;<br>
-produce&nbsp;the&nbsp;same&nbsp;kind&nbsp;of&nbsp;match,&nbsp;so&nbsp;we&nbsp;must&nbsp;compare&nbsp;the&nbsp;matched&nbsp;number&nbsp;with<br>
-the&nbsp;first&nbsp;part&nbsp;of&nbsp;the&nbsp;provisional&nbsp;designation.&nbsp;<br>
+ <dl><dt><a name="-is_single_unpacked_provisional"><strong>is_single_unpacked_provisional</strong></a>(designation: str) -&gt; bool</dt><dd><tt>An&nbsp;unpacked&nbsp;provisional&nbsp;designation&nbsp;will&nbsp;be&nbsp;(mistakenly)&nbsp;identified&nbsp;as&nbsp;a&nbsp;valid<br>
+numbered&nbsp;designation&nbsp;by&nbsp;<a href="#-is_valid_provisional_designation">is_valid_provisional_designation</a>()&nbsp;because&nbsp;the&nbsp;second<br>
+part&nbsp;is&nbsp;ignored.&nbsp;A&nbsp;single&nbsp;provisional&nbsp;designation&nbsp;has&nbsp;the&nbsp;property&nbsp;that&nbsp;its<br>
+"wrongly"&nbsp;parsed&nbsp;number&nbsp;designation&nbsp;must&nbsp;be&nbsp;equal&nbsp;to&nbsp;its&nbsp;year&nbsp;part.&nbsp;For&nbsp;instance<br>
+"(341843)&nbsp;2008&nbsp;EV5&nbsp;plus&nbsp;ignored&nbsp;text"&nbsp;will&nbsp;return&nbsp;False&nbsp;in&nbsp;this&nbsp;case,&nbsp;but<br>
+"2008&nbsp;EV5&nbsp;plus&nbsp;further&nbsp;ignored&nbsp;text"&nbsp;will&nbsp;return&nbsp;True.<br>
 &nbsp;<br>
-*Input:&nbsp;an&nbsp;asteroid&nbsp;designation&nbsp;(string&nbsp;or&nbsp;int)<br>
+*Input:&nbsp;an&nbsp;asteroid&nbsp;designation&nbsp;(string)<br>
 &nbsp;<br>
 *Return:&nbsp;boolean</tt></dd></dl>
  <dl><dt><a name="-is_unpacked_survey_designation"><strong>is_unpacked_survey_designation</strong></a>(designation: str) -&gt; bool</dt></dl>
