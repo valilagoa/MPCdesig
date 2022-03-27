@@ -117,22 +117,73 @@ vmalilagoa@gmail.com<br>
 </td><td width="25%" valign=top><a href="sys.html">sys</a><br>
 </td></tr></table></td></tr></table><p>
 <table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="enum.html#Enum">enum.Enum</a>(<a href="builtins.html#object">builtins.object</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="MPCdesig.html#Mode">Mode</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="Mode">class <strong>Mode</strong></a>(<a href="enum.html#Enum">enum.Enum</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt><a href="#Mode">Mode</a>(value,&nbsp;names=None,&nbsp;*,&nbsp;module=None,&nbsp;qualname=None,&nbsp;type=None,&nbsp;start=1)<br>
+&nbsp;<br>
+An&nbsp;enumeration.<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="MPCdesig.html#Mode">Mode</a></dd>
+<dd><a href="enum.html#Enum">enum.Enum</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>PACK</strong> = &lt;Mode.PACK: 'pack'&gt;</dl>
+
+<dl><dt><strong>UNPACK</strong> = &lt;Mode.UNPACK: 'unpack'&gt;</dl>
+
+<hr>
+Data descriptors inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+<dl><dt><strong>name</strong></dt>
+<dd><tt>The&nbsp;name&nbsp;of&nbsp;the&nbsp;Enum&nbsp;member.</tt></dd>
+</dl>
+<dl><dt><strong>value</strong></dt>
+<dd><tt>The&nbsp;value&nbsp;of&nbsp;the&nbsp;Enum&nbsp;member.</tt></dd>
+</dl>
+<hr>
+Readonly properties inherited from <a href="enum.html#EnumMeta">enum.EnumMeta</a>:<br>
+<dl><dt><strong>__members__</strong></dt>
+<dd><tt>Returns&nbsp;a&nbsp;mapping&nbsp;of&nbsp;member&nbsp;name-&gt;value.<br>
+&nbsp;<br>
+This&nbsp;mapping&nbsp;lists&nbsp;all&nbsp;enum&nbsp;members,&nbsp;including&nbsp;aliases.&nbsp;Note&nbsp;that&nbsp;this<br>
+is&nbsp;a&nbsp;read-only&nbsp;view&nbsp;of&nbsp;the&nbsp;internal&nbsp;mapping.</tt></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
 <tr bgcolor="#eeaa77">
 <td colspan=3 valign=bottom>&nbsp;<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-convert"><strong>convert</strong></a>(input_, p_or_unp)</dt><dd><tt>Pack&nbsp;or&nbsp;unpack&nbsp;the&nbsp;input&nbsp;designation&nbsp;or&nbsp;file&nbsp;with&nbsp;designations.&nbsp;This&nbsp;is&nbsp;<br>
-simply&nbsp;the&nbsp;<a href="#-main">main</a>()&nbsp;function&nbsp;but&nbsp;without&nbsp;using&nbsp;the&nbsp;argument&nbsp;parser&nbsp;and&nbsp;a&nbsp;<br>
-hard-coded&nbsp;default&nbsp;separator&nbsp;(the&nbsp;underscore&nbsp;character).&nbsp;This&nbsp;means&nbsp;that&nbsp;<br>
-the&nbsp;second&nbsp;argument&nbsp;must&nbsp;exactly&nbsp;be&nbsp;either&nbsp;"pack"&nbsp;or&nbsp;"unpack",&nbsp;otherwise&nbsp;it&nbsp;<br>
-will&nbsp;not&nbsp;work.&nbsp;Another&nbsp;issue&nbsp;is&nbsp;that&nbsp;it&nbsp;also&nbsp;does&nbsp;not&nbsp;have&nbsp;the&nbsp;same&nbsp;error&nbsp;<br>
-handling&nbsp;as&nbsp;the&nbsp;<a href="#-main">main</a>()&nbsp;function,&nbsp;so&nbsp;I&nbsp;do&nbsp;not&nbsp;recommend&nbsp;its&nbsp;use&nbsp;as&nbsp;a&nbsp;black&nbsp;<br>
-box.&nbsp;However,&nbsp;it&nbsp;could&nbsp;be&nbsp;a&nbsp;good&nbsp;template&nbsp;for&nbsp;creating&nbsp;your&nbsp;own&nbsp;"convert"&nbsp;<br>
-function(s)&nbsp;in&nbsp;your&nbsp;own&nbsp;script(s)&nbsp;or&nbsp;module(s).&nbsp;<br>
+<td width="100%"><dl><dt><a name="-convert"><strong>convert</strong></a>(designation: Union[str, int], mode: enum.Enum) -&gt; str</dt><dd><tt>Pack&nbsp;or&nbsp;unpack&nbsp;the&nbsp;input&nbsp;designation&nbsp;or&nbsp;file&nbsp;with&nbsp;designations.&nbsp;This&nbsp;is<br>
+simply&nbsp;the&nbsp;<a href="#-main">main</a>()&nbsp;function&nbsp;but&nbsp;without&nbsp;using&nbsp;the&nbsp;argument&nbsp;parser&nbsp;and&nbsp;a<br>
+hard-coded&nbsp;default&nbsp;separator&nbsp;(the&nbsp;underscore&nbsp;character).&nbsp;It&nbsp;does&nbsp;not<br>
+have&nbsp;the&nbsp;same&nbsp;error&nbsp;handling&nbsp;as&nbsp;the&nbsp;<a href="#-main">main</a>()&nbsp;function,&nbsp;so&nbsp;I&nbsp;do&nbsp;not&nbsp;recommend<br>
+its&nbsp;use&nbsp;as&nbsp;a&nbsp;black&nbsp;box.&nbsp;However,&nbsp;it&nbsp;could&nbsp;be&nbsp;a&nbsp;good&nbsp;template&nbsp;for&nbsp;creating<br>
+your&nbsp;own&nbsp;"convert"&nbsp;function(s)&nbsp;in&nbsp;your&nbsp;own&nbsp;script(s)&nbsp;or&nbsp;module(s).<br>
 &nbsp;<br>
 *Input:&nbsp;asteroid&nbsp;designation&nbsp;or&nbsp;a&nbsp;file&nbsp;with&nbsp;asteroid&nbsp;designations<br>
-*Input:&nbsp;"pack"&nbsp;or&nbsp;"unpack"&nbsp;(no&nbsp;other&nbsp;strings&nbsp;are&nbsp;valid)<br>
+*Input:&nbsp;mode&nbsp;(<a href="#Mode">Mode</a>.PACK&nbsp;or&nbsp;<a href="#Mode">Mode</a>.UNPACK)<br>
 &nbsp;<br>
 *Return:&nbsp;string&nbsp;with&nbsp;output&nbsp;or&nbsp;an&nbsp;error&nbsp;message</tt></dd></dl>
  <dl><dt><a name="-decode_letter"><strong>decode_letter</strong></a>(character: str) -&gt; str</dt><dd><tt>A&nbsp;-&gt;&nbsp;10,&nbsp;B&nbsp;-&gt;&nbsp;11,&nbsp;...&nbsp;z&nbsp;-&gt;&nbsp;61<br>
@@ -229,7 +280,7 @@ errors.&nbsp;See&nbsp;also&nbsp;<a href="#-is_valid_provisional_designation">is_
 &nbsp;<br>
 *Return:&nbsp;boolean</tt></dd></dl>
  <dl><dt><a name="-main"><strong>main</strong></a>()</dt></dl>
- <dl><dt><a name="-pack"><strong>pack</strong></a>(input_desig)</dt><dd><tt>Call&nbsp;the&nbsp;necessary&nbsp;function&nbsp;for&nbsp;packing&nbsp;the&nbsp;input&nbsp;designation&nbsp;after&nbsp;some&nbsp;<br>
+ <dl><dt><a name="-pack"><strong>pack</strong></a>(designation: Union[str, int]) -&gt; str</dt><dd><tt>Call&nbsp;the&nbsp;necessary&nbsp;function&nbsp;for&nbsp;packing&nbsp;the&nbsp;input&nbsp;designation&nbsp;after&nbsp;some&nbsp;<br>
 checks.&nbsp;If&nbsp;the&nbsp;input&nbsp;designation&nbsp;is&nbsp;already&nbsp;a&nbsp;valid&nbsp;packed&nbsp;designation,&nbsp;it&nbsp;<br>
 returns&nbsp;it.&nbsp;<br>
 &nbsp;<br>
@@ -273,7 +324,7 @@ Otherwise,&nbsp;it&nbsp;returns&nbsp;an&nbsp;error&nbsp;message.&nbsp;<br>
 characters&nbsp;from&nbsp;the&nbsp;input&nbsp;string<br>
 &nbsp;<br>
 *Return:&nbsp;string</tt></dd></dl>
- <dl><dt><a name="-unpack"><strong>unpack</strong></a>(input_desig, separator)</dt><dd><tt>Call&nbsp;the&nbsp;necessary&nbsp;function&nbsp;for&nbsp;unpacking&nbsp;the&nbsp;input&nbsp;after&nbsp;some&nbsp;checks.&nbsp;<br>
+ <dl><dt><a name="-unpack"><strong>unpack</strong></a>(designation: Union[str, int], separator: str) -&gt; str</dt><dd><tt>Call&nbsp;the&nbsp;necessary&nbsp;function&nbsp;for&nbsp;unpacking&nbsp;the&nbsp;input&nbsp;after&nbsp;some&nbsp;checks.&nbsp;<br>
 If&nbsp;the&nbsp;input&nbsp;designation&nbsp;is&nbsp;already&nbsp;a&nbsp;valid&nbsp;unpacked&nbsp;designation,&nbsp;it&nbsp;<br>
 returns&nbsp;it.&nbsp;<br>
 &nbsp;<br>

@@ -106,6 +106,7 @@ try:
     import re
     import argparse
     from typing import Union, Tuple
+    from enum import Enum
 
 except ModuleNotFoundError:
     sys.exit(f"\n*****\npython {version_string}: {sys.exc_info()[1]}\n*****\n")
@@ -167,7 +168,6 @@ encode_year = {
     '20': 'K',
 }
 
-
 ################################################################################
 # Compiled regular expressions
 #
@@ -186,6 +186,15 @@ re_survey = re.compile(r"\b(\d{4})[- _]([PT])-([L123])\b")
 re_packed_survey = re.compile(r"\b([PT])([L123])S(\d{4})\b")
 re6digits = re.compile(r"\b(\d{2,})(\d{4})\b")
 re_packed_long = re.compile(r"(~)([0-9a-zA-Z]{4})\b")
+
+
+###############################################################################
+#
+# Enumeration to model a "packing" or "unpacking" mode (experimental)
+#
+class Mode(Enum):
+    PACK = "pack"
+    UNPACK = "unpack"
 
 
 ###############################################################################
@@ -385,14 +394,8 @@ def is_an_asteroid_designation(designation):
     *Return: boolean
     """
 
-    if is_valid_provisional_designation(designation):
-        return True
-    elif is_valid_survey_designation(designation):
-        return True
-    elif is_valid_number_designation(designation):
-        return True
-    else:
-        return False
+    return is_valid_provisional_designation(designation) or is_valid_survey_designation(
+        designation) or is_valid_number_designation(designation)
 
 
 def designation_matches_compiled_re(designation: str, compiled_re: re) -> bool:
@@ -748,7 +751,7 @@ def unpack_survey_designation(designation: str) -> str:
         return f"unpack_survey_designation(): Error. {error_message}"
 
 
-def unpack(input_desig, separator):
+def unpack(designation: Union[str, int], separator: str) -> str:
     """
     Call the necessary function for unpacking the input after some checks. 
     If the input designation is already a valid unpacked designation, it 
@@ -760,28 +763,27 @@ def unpack(input_desig, separator):
     *Return: an unpacked asteroid designation (string) or an error message
     """
 
-    error_message = """unpack(): Error. '{0}' not valid for unpacking""".format(
-        input_desig)
+    error_message = f"unpack(): Error. '{designation}' not valid for unpacking"
 
-    input_d = to_stripped_string(input_desig)
+    designation = str(designation).strip()
 
-    single_provis = is_single_unpacked_provisional(input_d)
+    single_provis = is_single_unpacked_provisional(designation)
 
-    if is_valid_survey_designation(input_d):
-        if is_unpacked_survey_designation(input_d):
-            return input_d
+    if is_valid_survey_designation(designation):
+        if is_unpacked_survey_designation(designation):
+            return designation
         else:
-            return unpack_survey_designation(input_d)
-    elif is_valid_number_designation(input_d) and not single_provis:
-        return unpack_num(input_d)
-    elif is_valid_provisional_designation(input_d):
-        return unpack_provisional(input_d, str(separator))
+            return unpack_survey_designation(designation)
+    elif is_valid_number_designation(designation) and not single_provis:
+        return unpack_num(designation)
+    elif is_valid_provisional_designation(designation):
+        return unpack_provisional(designation, str(separator))
 
     else:
         return error_message
 
 
-def pack(input_desig):
+def pack(designation: Union[str, int]) -> str:
     """
     Call the necessary function for packing the input designation after some 
     checks. If the input designation is already a valid packed designation, it 
@@ -792,60 +794,58 @@ def pack(input_desig):
     *Return: an unpacked asteroid designation (string) or error message
     """
 
-    error_message = """pack(): Error. '{0}' not valid for packing""".format(input_desig)
+    error_message = f"pack(): Error. '{designation}' not valid for packing"
 
-    input_d = to_stripped_string(input_desig)
+    designation = str(designation).strip()
 
-    single_provis = is_single_unpacked_provisional(input_d)
+    single_provis = is_single_unpacked_provisional(designation)
 
-    if is_valid_survey_designation(input_d):
-        return pack_survey_designation(input_d)
-    elif is_valid_number_designation(input_d) and not single_provis:
-        return pack_number_designation(input_d)
-    elif is_valid_provisional_designation(input_d):
-        return pack_provisional_designation(input_d)
+    if is_valid_survey_designation(designation):
+        return pack_survey_designation(designation)
+    elif is_valid_number_designation(designation) and not single_provis:
+        return pack_number_designation(designation)
+    elif is_valid_provisional_designation(designation):
+        return pack_provisional_designation(designation)
     else:
         return error_message
 
 
-def convert(input_, p_or_unp):
+def convert(designation: Union[str, int], mode: Enum) -> str:
     """
-    Pack or unpack the input designation or file with designations. This is 
-    simply the main() function but without using the argument parser and a 
-    hard-coded default separator (the underscore character). This means that 
-    the second argument must exactly be either "pack" or "unpack", otherwise it 
-    will not work. Another issue is that it also does not have the same error 
-    handling as the main() function, so I do not recommend its use as a black 
-    box. However, it could be a good template for creating your own "convert" 
-    function(s) in your own script(s) or module(s). 
+    Pack or unpack the input designation or file with designations. This is
+    simply the main() function but without using the argument parser and a
+    hard-coded default separator (the underscore character). It does not
+    have the same error handling as the main() function, so I do not recommend
+    its use as a black box. However, it could be a good template for creating
+    your own "convert" function(s) in your own script(s) or module(s).
 
     *Input: asteroid designation or a file with asteroid designations
-    *Input: "pack" or "unpack" (no other strings are valid)
-     
+    *Input: mode (Mode.PACK or Mode.UNPACK)
+
     *Return: string with output or an error message
     """
 
-    input_ = str(input_)
-    if len(input_) > 0 and is_an_asteroid_designation(input_):
-        designations = [input_]
+    designation = str(designation)
+    if len(designation) > 0 and is_an_asteroid_designation(designation):
+        designations = [designation]
         # Create a list with the input so that we can iterate over it
     else:
         try:
             # Perhaps it is an input filename, not a designation
-            my_file = open(input_, 'r')
+            my_file = open(designation, 'r')
             designations = my_file.readlines()
             my_file.close()
         except IOError:
-            print("convert(): Error. Did not find file '{0}'".format(input_))
+            print("convert(): Error. Did not find file '{0}'".format(designation))
             designations = []
             # We still need an empty list to iterate over
 
     for designation in designations:
         if len(designation.split()) < 1:
             print("convert(): Warning. Input is an empty line")
-        elif "unpack" in p_or_unp:
+        elif mode == Mode.UNPACK:
             print(unpack(designation.replace("\n", ""), "_"))
-        elif len(p_or_unp) == 4 and "pack" in p_or_unp:
+        elif mode == Mode.PACK:
             print(pack(designation.replace("\n", "")))
         else:
             print("convert(): Error. 2nd arg. must be 'pack' or 'unpack'")
