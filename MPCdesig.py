@@ -105,7 +105,7 @@ try:
     import numpy as np
     import re
     import argparse
-    from typing import Union, Tuple
+    from typing import Union, Tuple, Optional
     from enum import Enum
 
 except ModuleNotFoundError:
@@ -144,9 +144,8 @@ argParserMPC.add_argument(
     help='Pack the input')
 
 argParserMPC.add_argument(
-    '-s', dest='separator', default=" ",
-    help="""Separator character for provis. designations.\n
-Default '_' (e.g. 2008_EV5)""")
+    '-s', dest='separator', default="_",
+    help="Character for separating provisional designations. Default '_' (e.g. 2008_EV5)")
 
 argParserMPC.add_argument(
     '-u', dest='unpack', action="store_true",
@@ -195,13 +194,14 @@ re_packed_long = re.compile(r"(~)([0-9a-zA-Z]{4})\b")
 class Mode(Enum):
     PACK = "pack"
     UNPACK = "unpack"
-
+    DEACTIVATED = "deactivated"
 
 ###############################################################################
 # Functions
 #
 # Most functions belong to two types: some check, some pack or unpack 
 #
+
 
 def decode_letter(character: str) -> str:
     """A -> 10, B -> 11, ... z -> 61
@@ -810,58 +810,47 @@ def pack(designation: Union[str, int]) -> str:
         return error_message
 
 
-def convert(designation: Union[str, int], mode: Enum) -> str:
+def convert(designation: Union[str, int], mode: Enum, separator: Optional[str] = None) -> str:
     """
-    Pack or unpack the input designation or file with designations. This is
-    simply the main() function but without using the argument parser and a
-    hard-coded default separator (the underscore character). It does not
-    have the same error handling as the main() function, so I do not recommend
-    its use as a black box. However, it could be a good template for creating
-    your own "convert" function(s) in your own script(s) or module(s).
+    Pack or unpack the input designation or file with designations depending
+    on input mode (Mode.PACK or Mode.UNPACK).
 
     *Input: asteroid designation or a file with asteroid designations
-    *Input: mode (Mode.PACK or Mode.UNPACK)
+    *Input: mode enumeration
+    *Optional[Input]: separator for unpacked provisional designations (the default is the underscore)
 
     *Return: string with output or an error message
     """
 
-    designation = str(designation)
-    if len(designation) > 0 and is_an_asteroid_designation(designation):
-        designations = [designation]
-        # Create a list with the input so that we can iterate over it
-    else:
-        try:
-            # Perhaps it is an input filename, not a designation
-            my_file = open(designation, 'r')
-            designations = my_file.readlines()
-            my_file.close()
-        except IOError:
-            print("convert(): Error. Did not find file '{0}'".format(designation))
-            designations = []
-            # We still need an empty list to iterate over
-
-    for designation in designations:
-        if len(designation.split()) < 1:
-            print("convert(): Warning. Input is an empty line")
-        elif mode == Mode.UNPACK:
-            print(unpack(designation.replace("\n", ""), "_"))
+    designation = str(designation).strip().replace("\n", "")
+    if is_an_asteroid_designation(designation):
+        if mode == Mode.UNPACK:
+            separator = "_" if separator is None else separator
+            return unpack(designation, separator)
         elif mode == Mode.PACK:
-            print(pack(designation.replace("\n", "")))
+            return pack(designation)
         else:
-            print("convert(): Error. 2nd arg. must be 'pack' or 'unpack'")
+            return "convert() warning: input Mode.PACK or Mode.UNPACK to convert"
+    else:
+        return f"convert() error: {designation} is not a valid asteroid designation"
 
 
 def main():
+
+    mode = Mode.DEACTIVATED  # by default
     parsed = argParserMPC.parse_args()
 
     if not (parsed.pack or parsed.unpack):
         print("main(): Error. Either -p or -u must be used")
         sys.exit(-1)
+    elif parsed.pack:
+        mode = Mode.PACK
+    elif parsed.unpack:
+        mode = Mode.UNPACK
 
     if parsed.designation:
         # if we parsed a designation, we have a list with one element
         designations = [parsed.designation]
-
     elif parsed.filename:
         filename = str(parsed.filename)
         # we expect a file with many designations
@@ -870,10 +859,10 @@ def main():
             designations = openfile.readlines()
             openfile.close()
         except IOError:
-            print("main(): Error. Did not find file '{0}'\n".format(filename))
+            print(f"main() error: Did not find file '{filename}'\n")
             sys.exit(-2)
     else:
-        print("main(): Error. Input a designation [-d] or a file name [-f]")
+        print("main() error: Input a designation [-d] or a file name [-f]")
         sys.exit(-3)
 
     #
@@ -883,10 +872,7 @@ def main():
         if len(designation.split()) < 1:
             print("main(): Warning. Empty line")
         else:
-            if parsed.pack:
-                print(pack(designation.replace("\n", "")))
-            elif parsed.unpack:
-                print(unpack(designation.replace("\n", ""), parsed.separator))
+            print(convert(designation, mode, parsed.separator))
 
 
 if __name__ == "__main__":
