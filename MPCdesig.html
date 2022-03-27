@@ -206,7 +206,7 @@ compiled&nbsp;regular&nbsp;expressions.<br>
 one&nbsp;to&nbsp;encode&nbsp;two&nbsp;digits&nbsp;into&nbsp;letters<br>
 &nbsp;<br>
 *Return:&nbsp;dictionary,&nbsp;dictionary</tt></dd></dl>
- <dl><dt><a name="-is_an_asteroid_designation"><strong>is_an_asteroid_designation</strong></a>(designation)</dt><dd><tt>This&nbsp;function&nbsp;checks&nbsp;whether&nbsp;the&nbsp;input&nbsp;is&nbsp;a&nbsp;valid&nbsp;asteroid&nbsp;designation.&nbsp;It&nbsp;<br>
+ <dl><dt><a name="-is_asteroid_designation"><strong>is_asteroid_designation</strong></a>(designation)</dt><dd><tt>This&nbsp;function&nbsp;checks&nbsp;whether&nbsp;the&nbsp;input&nbsp;is&nbsp;a&nbsp;valid&nbsp;asteroid&nbsp;designation.&nbsp;It&nbsp;<br>
 simply&nbsp;encapsulates&nbsp;calls&nbsp;to&nbsp;<a href="#-is_valid_provisional_designation">is_valid_provisional_designation</a>(),&nbsp;<br>
 <a href="#-is_valid_survey_designation">is_valid_survey_designation</a>()&nbsp;and&nbsp;<a href="#-is_valid_number_designation">is_valid_number_designation</a>().<br>
 &nbsp;<br>
@@ -338,15 +338,16 @@ the&nbsp;Minor&nbsp;Planet&nbsp;Center's&nbsp;specification.&nbsp;<br>
 &nbsp;<br>
 *Return:&nbsp;string&nbsp;with&nbsp;the&nbsp;corresponding&nbsp;unpacked&nbsp;designation&nbsp;or&nbsp;an&nbsp;error&nbsp;<br>
 message</tt></dd></dl>
- <dl><dt><a name="-unpack_num"><strong>unpack_num</strong></a>(designation: Union[str, int]) -&gt; str</dt><dd><tt>Return&nbsp;the&nbsp;unpacked&nbsp;version&nbsp;of&nbsp;the&nbsp;input&nbsp;number&nbsp;designation&nbsp;if&nbsp;it&nbsp;is<br>
-a&nbsp;valid&nbsp;packed&nbsp;one,&nbsp;or&nbsp;the&nbsp;very&nbsp;input&nbsp;if&nbsp;it&nbsp;is&nbsp;a&nbsp;valid&nbsp;unpacked&nbsp;one.<br>
-It&nbsp;returns&nbsp;an&nbsp;error&nbsp;message&nbsp;otherwise.<br>
+ <dl><dt><a name="-unpack_number_designation"><strong>unpack_number_designation</strong></a>(designation: Union[str, int]) -&gt; str</dt><dd><tt>Return&nbsp;the&nbsp;unpacked&nbsp;version&nbsp;of&nbsp;the&nbsp;input&nbsp;number&nbsp;designation&nbsp;if&nbsp;it&nbsp;is<br>
+a&nbsp;valid&nbsp;packed&nbsp;one&nbsp;or&nbsp;the&nbsp;input&nbsp;itself&nbsp;if&nbsp;it&nbsp;is&nbsp;already&nbsp;a&nbsp;valid&nbsp;unpacked<br>
+designation.&nbsp;Return&nbsp;an&nbsp;error&nbsp;message&nbsp;otherwise.<br>
 &nbsp;<br>
 *Input:&nbsp;asteroid&nbsp;designation&nbsp;(string&nbsp;or&nbsp;int)<br>
 &nbsp;<br>
 *Return:&nbsp;unpacked&nbsp;designation&nbsp;or&nbsp;error&nbsp;message</tt></dd></dl>
- <dl><dt><a name="-unpack_provisional"><strong>unpack_provisional</strong></a>(designation: Union[str, int], separator: str) -&gt; str</dt><dd><tt>Return&nbsp;the&nbsp;unpacked&nbsp;version&nbsp;of&nbsp;the&nbsp;input&nbsp;provisional&nbsp;designation&nbsp;if&nbsp;<br>
-it&nbsp;is&nbsp;a&nbsp;valid&nbsp;packed&nbsp;one,&nbsp;or&nbsp;the&nbsp;very&nbsp;input&nbsp;if&nbsp;it&nbsp;is&nbsp;a&nbsp;valid&nbsp;unpacked&nbsp;one.<br>
+ <dl><dt><a name="-unpack_provisional_designation"><strong>unpack_provisional_designation</strong></a>(designation: Union[str, int], separator: str) -&gt; str</dt><dd><tt>Return&nbsp;the&nbsp;unpacked&nbsp;version&nbsp;of&nbsp;the&nbsp;input&nbsp;provisional&nbsp;designation&nbsp;if&nbsp;<br>
+it&nbsp;is&nbsp;a&nbsp;valid&nbsp;packed&nbsp;one&nbsp;or&nbsp;the&nbsp;input&nbsp;itself&nbsp;if&nbsp;it&nbsp;is&nbsp;already&nbsp;a&nbsp;valid<br>
+unpacked&nbsp;designation.&nbsp;Return&nbsp;an&nbsp;error&nbsp;message&nbsp;otherwise<br>
 &nbsp;<br>
 *Input:&nbsp;an&nbsp;asteroid&nbsp;designation&nbsp;(string&nbsp;or&nbsp;integer)<br>
 *Input:&nbsp;a&nbsp;character&nbsp;that&nbsp;will&nbsp;be&nbsp;used&nbsp;as&nbsp;separator&nbsp;in&nbsp;the&nbsp;output&nbsp;provisional<br>
