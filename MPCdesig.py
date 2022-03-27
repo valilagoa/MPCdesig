@@ -195,7 +195,12 @@ re_packed_long = re.compile(r"(~)([0-9a-zA-Z]{4})\b")
 #
 
 def decode_letter(character: str) -> str:
-    """A -> 10, B -> 11, ... z -> 61"""
+    """A -> 10, B -> 11, ... z -> 61
+
+    *Input: str
+
+    *Return: str
+    """
     if len(character) != 1 or character < 'A' or character > 'z':
         return f"decode_letter() error: invalid character {character}"
     elif character <= 'Z':
@@ -205,13 +210,18 @@ def decode_letter(character: str) -> str:
 
 
 def encode_cyphers(cyphers: Union[str, int]) -> str:
-    """10 -> A, 11 -> B, ... 61 > z"""
+    """10 -> A, 11 -> B, ... 61 > z
+
+    *Input: str
+
+    *Return: str
+    """
     try:
         number = int(cyphers)
         if number > 61 or number < 10:
             raise ValueError
     except ValueError:
-        return f"error"
+        return f"encode_cyphers() error: {cyphers} cannot be encoded to a character"
 
     if number < 36:
         return chr(number + 55)
@@ -221,16 +231,19 @@ def encode_cyphers(cyphers: Union[str, int]) -> str:
 
 def get_packing_dictionaries() -> Tuple[dict, dict]:
     """Returns two dictionaries, one to decode a letter into two digits,
-    one to encode two digits into letters"""
+    one to encode two digits into letters
+
+    *Return: dictionary, dictionary
+    """
 
     decode: dict = {'00': '0'}
     encode: dict = {}
 
     for character_index in range(97, 123):
-        upper_case_number = str(character_index-87)
-        lower_case_number = str(character_index-61)
+        upper_case_number = str(character_index - 87)
+        lower_case_number = str(character_index - 61)
 
-        upper_case_character = chr(character_index-32)
+        upper_case_character = chr(character_index - 32)
         lower_case_character = chr(character_index)
 
         # encode to upper case letters: 10 -> A, 11 -> B, ... 35 -> Z
@@ -430,12 +443,16 @@ def is_packed_or_unpacked(designation: str,
 
 def is_single_unpacked_provisional(designation: str) -> bool:
     """
+    For instance:
+    "(341843) 2008 EV5 plus ignored text" -> False
+    but
+    "2008 EV5 plus further ignored text" -> True.
+
     An unpacked provisional designation will be (mistakenly) identified as a valid
     numbered designation by is_valid_provisional_designation() because the second
-    part is ignored. A single provisional designation has the property that its
-    "wrongly" parsed number designation must be equal to its year part. For instance
-    "(341843) 2008 EV5 plus ignored text" will return False in this case, but
-    "2008 EV5 plus further ignored text" will return True.
+    part is ignored. A single provisional designation has the property that the
+    number parsed by re_number_designation is equal to the year part parsed by
+    re_provisional_designation().
 
     *Input: an asteroid designation (string)
 
@@ -469,21 +486,21 @@ def pack_base_62(designation: Union[str, int]) -> str:
 
     try:
         number = int(designation) - 620000
-        result = ""
     except ValueError:
         return f"pack_base_62(): Error. {designation} is not a valid number designation"
 
+    result = "~"  # the packed format always starts with ~
     for i in range(4):
-        q = number // 62
-        rem = number % 62
-        if rem > 9:
-            rem = f"{encode_cyphers(str(rem))}"
-        number = q
-        result = str(rem) + result
-    return "~" + "{0}".format(result)
+        quotient = number // 62
+        remainder = number % 62
+        if remainder > 9:
+            remainder = f"{encode_cyphers(str(remainder))}"
+        number = quotient
+        result = str(remainder) + result
+    return result
 
 
-def unpack_base_62(designation: Union[str, int]) -> str:
+def unpack_base_62(designation: str) -> str:
     """
     Unpack a number designation greater than 619999 (e.g. "~12z3") following
     the Minor Planet Center's specification. 
@@ -498,16 +515,15 @@ def unpack_base_62(designation: Union[str, int]) -> str:
         error_message = f"{designation} is not a valid packed long number designation"
         return f"unpack_base_62(): Error. {error_message}"
 
-    suma = 0
-    designation = str(designation).strip()
-    for i in range(4):
-        character_i = designation[1 + i]
-        if character_i.isdigit():
-            num = int(character_i)
+    total = 620000  # ~0000 corresponds to 620000
+    characters = designation.strip()[1:]  # removed the ~
+    for position, character in enumerate(characters[::-1]):
+        if character.isdigit():
+            integer_value = int(character)
         else:
-            num = int(decode_letter(designation[1 + i]))
-        suma += num * np.power(62, 3 - i)
-    return str(suma + 620000)
+            integer_value = int(decode_letter(character))
+        total += integer_value * np.power(62, position)
+    return str(total)
 
 
 def pack_number_designation(designation: Union[str, int]) -> str:

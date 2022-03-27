@@ -135,7 +135,11 @@ function(s)&nbsp;in&nbsp;your&nbsp;own&nbsp;script(s)&nbsp;or&nbsp;module(s).&nb
 *Input:&nbsp;"pack"&nbsp;or&nbsp;"unpack"&nbsp;(no&nbsp;other&nbsp;strings&nbsp;are&nbsp;valid)<br>
 &nbsp;<br>
 *Return:&nbsp;string&nbsp;with&nbsp;output&nbsp;or&nbsp;an&nbsp;error&nbsp;message</tt></dd></dl>
- <dl><dt><a name="-decode_letter"><strong>decode_letter</strong></a>(character: str) -&gt; str</dt><dd><tt>A&nbsp;-&gt;&nbsp;10,&nbsp;B&nbsp;-&gt;&nbsp;11,&nbsp;...&nbsp;z&nbsp;-&gt;&nbsp;61</tt></dd></dl>
+ <dl><dt><a name="-decode_letter"><strong>decode_letter</strong></a>(character: str) -&gt; str</dt><dd><tt>A&nbsp;-&gt;&nbsp;10,&nbsp;B&nbsp;-&gt;&nbsp;11,&nbsp;...&nbsp;z&nbsp;-&gt;&nbsp;61<br>
+&nbsp;<br>
+*Input:&nbsp;str<br>
+&nbsp;<br>
+*Return:&nbsp;str</tt></dd></dl>
  <dl><dt><a name="-designation_matches_compiled_re"><strong>designation_matches_compiled_re</strong></a>(designation: str, compiled_re: &lt;module 're' from '/usr/lib/python3.8/re.py'&gt;) -&gt; bool</dt><dd><tt>Check&nbsp;whether&nbsp;the&nbsp;input&nbsp;asteroid&nbsp;designation&nbsp;is&nbsp;matched&nbsp;by&nbsp;the&nbsp;input&nbsp;<br>
 compiled&nbsp;regular&nbsp;expressions.<br>
 &nbsp;<br>
@@ -143,9 +147,15 @@ compiled&nbsp;regular&nbsp;expressions.<br>
 *Input:&nbsp;a&nbsp;compiled&nbsp;regular&nbsp;expression<br>
 &nbsp;<br>
 *Return:&nbsp;boolean</tt></dd></dl>
- <dl><dt><a name="-encode_cyphers"><strong>encode_cyphers</strong></a>(cyphers: Union[str, int]) -&gt; str</dt><dd><tt>10&nbsp;-&gt;&nbsp;A,&nbsp;11&nbsp;-&gt;&nbsp;B,&nbsp;...&nbsp;61&nbsp;&gt;&nbsp;z</tt></dd></dl>
+ <dl><dt><a name="-encode_cyphers"><strong>encode_cyphers</strong></a>(cyphers: Union[str, int]) -&gt; str</dt><dd><tt>10&nbsp;-&gt;&nbsp;A,&nbsp;11&nbsp;-&gt;&nbsp;B,&nbsp;...&nbsp;61&nbsp;&gt;&nbsp;z<br>
+&nbsp;<br>
+*Input:&nbsp;str<br>
+&nbsp;<br>
+*Return:&nbsp;str</tt></dd></dl>
  <dl><dt><a name="-get_packing_dictionaries"><strong>get_packing_dictionaries</strong></a>() -&gt; Tuple[dict, dict]</dt><dd><tt>Returns&nbsp;two&nbsp;dictionaries,&nbsp;one&nbsp;to&nbsp;decode&nbsp;a&nbsp;letter&nbsp;into&nbsp;two&nbsp;digits,<br>
-one&nbsp;to&nbsp;encode&nbsp;two&nbsp;digits&nbsp;into&nbsp;letters</tt></dd></dl>
+one&nbsp;to&nbsp;encode&nbsp;two&nbsp;digits&nbsp;into&nbsp;letters<br>
+&nbsp;<br>
+*Return:&nbsp;dictionary,&nbsp;dictionary</tt></dd></dl>
  <dl><dt><a name="-is_an_asteroid_designation"><strong>is_an_asteroid_designation</strong></a>(designation)</dt><dd><tt>This&nbsp;function&nbsp;checks&nbsp;whether&nbsp;the&nbsp;input&nbsp;is&nbsp;a&nbsp;valid&nbsp;asteroid&nbsp;designation.&nbsp;It&nbsp;<br>
 simply&nbsp;encapsulates&nbsp;calls&nbsp;to&nbsp;<a href="#-is_valid_provisional_designation">is_valid_provisional_designation</a>(),&nbsp;<br>
 <a href="#-is_valid_survey_designation">is_valid_survey_designation</a>()&nbsp;and&nbsp;<a href="#-is_valid_number_designation">is_valid_number_designation</a>().<br>
@@ -166,12 +176,16 @@ certain&nbsp;type&nbsp;of&nbsp;unpacked&nbsp;designation,&nbsp;e.g.&nbsp;re_pack
 &nbsp;<br>
 *Return:&nbsp;boolean</tt></dd></dl>
  <dl><dt><a name="-is_packed_survey_designation"><strong>is_packed_survey_designation</strong></a>(designation: str) -&gt; bool</dt></dl>
- <dl><dt><a name="-is_single_unpacked_provisional"><strong>is_single_unpacked_provisional</strong></a>(designation: str) -&gt; bool</dt><dd><tt>An&nbsp;unpacked&nbsp;provisional&nbsp;designation&nbsp;will&nbsp;be&nbsp;(mistakenly)&nbsp;identified&nbsp;as&nbsp;a&nbsp;valid<br>
+ <dl><dt><a name="-is_single_unpacked_provisional"><strong>is_single_unpacked_provisional</strong></a>(designation: str) -&gt; bool</dt><dd><tt>For&nbsp;instance:<br>
+"(341843)&nbsp;2008&nbsp;EV5&nbsp;plus&nbsp;ignored&nbsp;text"&nbsp;-&gt;&nbsp;False<br>
+but<br>
+"2008&nbsp;EV5&nbsp;plus&nbsp;further&nbsp;ignored&nbsp;text"&nbsp;-&gt;&nbsp;True.<br>
+&nbsp;<br>
+An&nbsp;unpacked&nbsp;provisional&nbsp;designation&nbsp;will&nbsp;be&nbsp;(mistakenly)&nbsp;identified&nbsp;as&nbsp;a&nbsp;valid<br>
 numbered&nbsp;designation&nbsp;by&nbsp;<a href="#-is_valid_provisional_designation">is_valid_provisional_designation</a>()&nbsp;because&nbsp;the&nbsp;second<br>
-part&nbsp;is&nbsp;ignored.&nbsp;A&nbsp;single&nbsp;provisional&nbsp;designation&nbsp;has&nbsp;the&nbsp;property&nbsp;that&nbsp;its<br>
-"wrongly"&nbsp;parsed&nbsp;number&nbsp;designation&nbsp;must&nbsp;be&nbsp;equal&nbsp;to&nbsp;its&nbsp;year&nbsp;part.&nbsp;For&nbsp;instance<br>
-"(341843)&nbsp;2008&nbsp;EV5&nbsp;plus&nbsp;ignored&nbsp;text"&nbsp;will&nbsp;return&nbsp;False&nbsp;in&nbsp;this&nbsp;case,&nbsp;but<br>
-"2008&nbsp;EV5&nbsp;plus&nbsp;further&nbsp;ignored&nbsp;text"&nbsp;will&nbsp;return&nbsp;True.<br>
+part&nbsp;is&nbsp;ignored.&nbsp;A&nbsp;single&nbsp;provisional&nbsp;designation&nbsp;has&nbsp;the&nbsp;property&nbsp;that&nbsp;the<br>
+number&nbsp;parsed&nbsp;by&nbsp;re_number_designation&nbsp;is&nbsp;equal&nbsp;to&nbsp;the&nbsp;year&nbsp;part&nbsp;parsed&nbsp;by<br>
+re_provisional_designation().<br>
 &nbsp;<br>
 *Input:&nbsp;an&nbsp;asteroid&nbsp;designation&nbsp;(string)<br>
 &nbsp;<br>
@@ -267,7 +281,7 @@ returns&nbsp;it.&nbsp;<br>
 *Input:&nbsp;character&nbsp;to&nbsp;be&nbsp;used&nbsp;to&nbsp;separate&nbsp;provisional&nbsp;designations<br>
 &nbsp;<br>
 *Return:&nbsp;an&nbsp;unpacked&nbsp;asteroid&nbsp;designation&nbsp;(string)&nbsp;or&nbsp;an&nbsp;error&nbsp;message</tt></dd></dl>
- <dl><dt><a name="-unpack_base_62"><strong>unpack_base_62</strong></a>(designation: Union[str, int]) -&gt; str</dt><dd><tt>Unpack&nbsp;a&nbsp;number&nbsp;designation&nbsp;greater&nbsp;than&nbsp;619999&nbsp;(e.g.&nbsp;"~12z3")&nbsp;following<br>
+ <dl><dt><a name="-unpack_base_62"><strong>unpack_base_62</strong></a>(designation: str) -&gt; str</dt><dd><tt>Unpack&nbsp;a&nbsp;number&nbsp;designation&nbsp;greater&nbsp;than&nbsp;619999&nbsp;(e.g.&nbsp;"~12z3")&nbsp;following<br>
 the&nbsp;Minor&nbsp;Planet&nbsp;Center's&nbsp;specification.&nbsp;<br>
 &nbsp;<br>
 *Input:&nbsp;a&nbsp;valid&nbsp;packed&nbsp;number&nbsp;designation&nbsp;(string&nbsp;or&nbsp;integer)<br>
