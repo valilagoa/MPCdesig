@@ -383,7 +383,7 @@ def is_valid_provisional_designation(designation: str) -> bool:
         return False
 
 
-def is_an_asteroid_designation(designation):
+def is_asteroid_designation(designation):
     """
     This function checks whether the input is a valid asteroid designation. It 
     simply encapsulates calls to is_valid_provisional_designation(), 
@@ -565,18 +565,18 @@ def pack_number_designation(designation: Union[str, int]) -> str:
         return error_message
 
 
-def unpack_num(designation: Union[str, int]) -> str:
+def unpack_number_designation(designation: Union[str, int]) -> str:
     """
     Return the unpacked version of the input number designation if it is
-    a valid packed one, or the very input if it is a valid unpacked one.
-    It returns an error message otherwise.
+    a valid packed one or the input itself if it is already a valid unpacked
+    designation. Return an error message otherwise.
 
     *Input: asteroid designation (string or int)
 
     *Return: unpacked designation or error message
     """
 
-    error_message = f"unpack_num(): Error. '{designation}' is not valid for unpacking"
+    error_message = f"unpack_number_designation(): Error. '{designation}' is not valid for unpacking"
 
     designation = str(designation).strip()
     if is_valid_number_designation(designation):
@@ -654,9 +654,10 @@ def pack_provisional_designation(designation: Union[str, int]) -> str:
         return error_message
 
 
-def unpack_provisional(designation: Union[str, int], separator: str) -> str:
+def unpack_provisional_designation(designation: Union[str, int], separator: str) -> str:
     """Return the unpacked version of the input provisional designation if 
-    it is a valid packed one, or the very input if it is a valid unpacked one.
+    it is a valid packed one or the input itself if it is already a valid
+    unpacked designation. Return an error message otherwise
     
     *Input: an asteroid designation (string or integer)
     *Input: a character that will be used as separator in the output provisional
@@ -665,7 +666,7 @@ def unpack_provisional(designation: Union[str, int], separator: str) -> str:
     *Return: unpacked provisional designation (str) or an error message
     """
 
-    error_message = f"unpack_provisional(): Error. '{designation}' not valid for unpacking"
+    error_message = f"unpack_provisional_designation(): Error. '{designation}' not valid for unpacking"
 
     designation = re.sub("[ _]", "-", str(designation).strip(), count=1)
     if is_valid_provisional_designation(designation):
@@ -775,9 +776,9 @@ def unpack(designation: Union[str, int], separator: str) -> str:
         else:
             return unpack_survey_designation(designation)
     elif is_valid_number_designation(designation) and not single_provis:
-        return unpack_num(designation)
+        return unpack_number_designation(designation)
     elif is_valid_provisional_designation(designation):
-        return unpack_provisional(designation, str(separator))
+        return unpack_provisional_designation(designation, str(separator))
 
     else:
         return error_message
@@ -823,7 +824,7 @@ def convert(designation: Union[str, int], mode: Enum, separator: Optional[str] =
     """
 
     designation = str(designation).strip().replace("\n", "")
-    if is_an_asteroid_designation(designation):
+    if is_asteroid_designation(designation):
         if mode == Mode.UNPACK:
             separator = "_" if separator is None else separator
             return unpack(designation, separator)
