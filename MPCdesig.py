@@ -25,7 +25,7 @@ modules.
 
 ## Requirements
 
-- (Python 3) argparse, numpy, re, sys  
+- (Python 3.8) argparse, numpy, re, sys
 
 
 ## Examples
