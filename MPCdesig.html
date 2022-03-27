@@ -148,6 +148,8 @@ An&nbsp;enumeration.<br>&nbsp;</tt></td></tr>
 </dl>
 <hr>
 Data and other attributes defined here:<br>
+<dl><dt><strong>DEACTIVATED</strong> = &lt;Mode.DEACTIVATED: 'deactivated'&gt;</dl>
+
 <dl><dt><strong>PACK</strong> = &lt;Mode.PACK: 'pack'&gt;</dl>
 
 <dl><dt><strong>UNPACK</strong> = &lt;Mode.UNPACK: 'unpack'&gt;</dl>
@@ -175,15 +177,12 @@ is&nbsp;a&nbsp;read-only&nbsp;view&nbsp;of&nbsp;the&nbsp;internal&nbsp;mapping.<
 <font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
     
 <tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><dl><dt><a name="-convert"><strong>convert</strong></a>(designation: Union[str, int], mode: enum.Enum) -&gt; str</dt><dd><tt>Pack&nbsp;or&nbsp;unpack&nbsp;the&nbsp;input&nbsp;designation&nbsp;or&nbsp;file&nbsp;with&nbsp;designations.&nbsp;This&nbsp;is<br>
-simply&nbsp;the&nbsp;<a href="#-main">main</a>()&nbsp;function&nbsp;but&nbsp;without&nbsp;using&nbsp;the&nbsp;argument&nbsp;parser&nbsp;and&nbsp;a<br>
-hard-coded&nbsp;default&nbsp;separator&nbsp;(the&nbsp;underscore&nbsp;character).&nbsp;It&nbsp;does&nbsp;not<br>
-have&nbsp;the&nbsp;same&nbsp;error&nbsp;handling&nbsp;as&nbsp;the&nbsp;<a href="#-main">main</a>()&nbsp;function,&nbsp;so&nbsp;I&nbsp;do&nbsp;not&nbsp;recommend<br>
-its&nbsp;use&nbsp;as&nbsp;a&nbsp;black&nbsp;box.&nbsp;However,&nbsp;it&nbsp;could&nbsp;be&nbsp;a&nbsp;good&nbsp;template&nbsp;for&nbsp;creating<br>
-your&nbsp;own&nbsp;"convert"&nbsp;function(s)&nbsp;in&nbsp;your&nbsp;own&nbsp;script(s)&nbsp;or&nbsp;module(s).<br>
+<td width="100%"><dl><dt><a name="-convert"><strong>convert</strong></a>(designation: Union[str, int], mode: enum.Enum, separator: Union[str, NoneType] = None) -&gt; str</dt><dd><tt>Pack&nbsp;or&nbsp;unpack&nbsp;the&nbsp;input&nbsp;designation&nbsp;or&nbsp;file&nbsp;with&nbsp;designations&nbsp;depending<br>
+on&nbsp;input&nbsp;mode&nbsp;(<a href="#Mode">Mode</a>.PACK&nbsp;or&nbsp;<a href="#Mode">Mode</a>.UNPACK).<br>
 &nbsp;<br>
 *Input:&nbsp;asteroid&nbsp;designation&nbsp;or&nbsp;a&nbsp;file&nbsp;with&nbsp;asteroid&nbsp;designations<br>
-*Input:&nbsp;mode&nbsp;(<a href="#Mode">Mode</a>.PACK&nbsp;or&nbsp;<a href="#Mode">Mode</a>.UNPACK)<br>
+*Input:&nbsp;mode&nbsp;enumeration<br>
+*Optional[Input]:&nbsp;separator&nbsp;for&nbsp;unpacked&nbsp;provisional&nbsp;designations&nbsp;(the&nbsp;default&nbsp;is&nbsp;the&nbsp;underscore)<br>
 &nbsp;<br>
 *Return:&nbsp;string&nbsp;with&nbsp;output&nbsp;or&nbsp;an&nbsp;error&nbsp;message</tt></dd></dl>
  <dl><dt><a name="-decode_letter"><strong>decode_letter</strong></a>(character: str) -&gt; str</dt><dd><tt>A&nbsp;-&gt;&nbsp;10,&nbsp;B&nbsp;-&gt;&nbsp;11,&nbsp;...&nbsp;z&nbsp;-&gt;&nbsp;61<br>
@@ -366,7 +365,8 @@ designation<br>
 <font color="#ffffff" face="helvetica, arial"><big><strong>Data</strong></big></font></td></tr>
     
 <tr><td bgcolor="#55aa55"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
-<td width="100%"><strong>Tuple</strong> = typing.Tuple<br>
+<td width="100%"><strong>Optional</strong> = typing.Optional<br>
+<strong>Tuple</strong> = typing.Tuple<br>
 <strong>Union</strong> = typing.Union<br>
 <strong>argParserMPC</strong> = ArgumentParser(prog='pydoc', usage=None, descrip...atter'&gt;, conflict_handler='error', add_help=True)<br>
 <strong>decode_year</strong> = {'I': '18', 'J': '19', 'K': '20'}<br>
